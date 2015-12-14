@@ -18,13 +18,14 @@ navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia 
 window.URL = window.URL || window.webkitURL;
 
 var videoElement = document.getElementById('video');
-
+var id = 0;
 
 function gotSources(sourceInfos) {
   for (var i = 0; i !== sourceInfos.length; ++i) {
 
     var sourceInfo = sourceInfos[i];
-		alert(sourceInfo.facing + sourceInfo.label + sourceInfo.id);
+		// alert(sourceInfo.facing + sourceInfo.label + sourceInfo.id);
+		id = sourceInfo.id;
     // var option = document.createElement('option');
     // option.value = sourceInfo.id;
     // if (sourceInfo.kind === 'audio') {
