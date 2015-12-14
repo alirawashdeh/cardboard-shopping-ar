@@ -296,8 +296,7 @@ function update()
 
 
 function resize() {
-	var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
-renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+
 	// var width = container.offsetWidth;
 	// var height = container.offsetHeight;
 	//
@@ -305,7 +304,7 @@ renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	// camera.updateProjectionMatrix();
 	//
 	// renderer.setSize(width, height);
-	 effect.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+	  effect.setSize(window.innerWidth,window.innerHeight);
 }
 
 
@@ -318,8 +317,8 @@ function render()
 		if ( videoTexture )
 			videoTexture.needsUpdate = true;
 	}
-	//effect.render(scene,camera);
-	renderer.render( scene, camera );
+	effect.render(scene,camera);
+	// renderer.render( scene, camera );
 }
 
 </script>
