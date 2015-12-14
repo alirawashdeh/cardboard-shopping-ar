@@ -170,18 +170,13 @@
 		// if ( Detector.webgl )
 		renderer = new THREE.WebGLRenderer( {antialias:true} );
 		// else
-		// 	renderer = new THREE.CanvasRenderer();
-		var SCREEN_WIDTH = window.outerWidth, SCREEN_HEIGHT = window.outerHeight;
-
-
-
-		renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-		container = document.getElementById( 'ThreeJS' );
+		//	renderer = new THREE.CanvasRenderer();
+	//	var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+	//	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+		 container = document.getElementById( 'ThreeJS' );
 		container.appendChild( renderer.domElement );
-
-
-		effect = new THREE.StereoEffect(renderer);
-		effect.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+		 effect = new THREE.StereoEffect(renderer);
+		//  effect.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 		// CONTROLS
 		controls = new THREE.OrbitControls( camera, renderer.domElement );
 
@@ -306,8 +301,9 @@
 		// camera.aspect = width / height;
 		// camera.updateProjectionMatrix();
 		//
-		renderer.setSize(window.outerWidth,window.outerHeight);
-		effect.setSize(window.outerWidth,window.outerHeight);
+		var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT =window.innerHeight;
+				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+						effect.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	}
 
 
