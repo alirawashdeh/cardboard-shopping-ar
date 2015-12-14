@@ -116,6 +116,7 @@ function start() {
 <script src="js/OrbitControls.js"></script>
 <script src="js/DeviceOrientationControls.js"></script>
 <script src="js/BoxGeometry.js"></script>
+<script src="js/StereoEffect.js"></script>
 
 <script src="js/THREEx.KeyboardState.js"></script>
 <script src="js/THREEx.FullScreen.js"></script>
@@ -151,24 +152,33 @@ animate();
 // FUNCTIONS
 function init()
 {
+
+
 	// SCENE
 	scene = new THREE.Scene();
-
 	// CAMERA
-	var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
-	var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 100, FAR = 20000;
-	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
+	 camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.001, 700);
+
+	// var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 100, FAR = 20000;
+	// camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
 	scene.add(camera);
-	camera.position.set(1,100,1);
-	camera.lookAt(scene.position);
+	// camera.position.set(1,20,1);
+		 camera.position.set(0, 15, 0);
+	//camera.lookAt(scene.position);
+
 	// RENDERER
 	if ( Detector.webgl )
 		renderer = new THREE.WebGLRenderer( {antialias:true} );
 	else
 		renderer = new THREE.CanvasRenderer();
+		var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
 	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	container = document.getElementById( 'ThreeJS' );
 	container.appendChild( renderer.domElement );
+
+
+	      effect = new THREE.StereoEffect(renderer);
+effect.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	// CONTROLS
 	controls = new THREE.OrbitControls( camera, renderer.domElement );
 
@@ -216,7 +226,7 @@ function init()
 	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
 	floorTexture.repeat.set( 10, 10 );
 	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-	var floorGeometry = new THREE.PlaneGeometry(100, 100, 1, 1);
+	var floorGeometry = new THREE.PlaneGeometry(80, 80, 1, 1);
 	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
 	//floor.position.y = 0.5;
 	floor.position.set(0,0,0);
@@ -244,7 +254,7 @@ function init()
 	var movieMaterial = new THREE.MeshBasicMaterial( { map: videoTexture, overdraw: true, side:THREE.DoubleSide } );
 	// the geometry on which the movie will be displayed;
 	// 		movie image will be scaled to fit these dimensions.
-	var movieGeometry = new THREE.PlaneGeometry( 100, 100, 1, 1 );
+	var movieGeometry = new THREE.PlaneGeometry( 275, 275, 1, 1 );
 	var movieScreen = new THREE.Mesh( movieGeometry, movieMaterial );
 	movieScreen.position.set(0,0,-120);
 	camera.add(movieScreen);
@@ -288,8 +298,8 @@ function render()
 		if ( videoTexture )
 			videoTexture.needsUpdate = true;
 	}
-
-	renderer.render( scene, camera );
+	effect.render(scene,camera);
+	//renderer.render( scene, camera );
 }
 
 </script>
