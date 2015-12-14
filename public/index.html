@@ -13,6 +13,7 @@
 	<video id="video" autoplay width="160" height="120" style="visibility: hidden; float:left;"></video>
 	<canvas id="videoImage" width="160" height="120" style="visibility: hidden; float:left;"></canvas>
 
+<div id="ThreeJS" style="width:100%;height:100%;position: absolute; left:0px; top:0px"></div>
 	<script>
 	navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 	window.URL = window.URL || window.webkitURL;
@@ -24,22 +25,8 @@
 		for (var i = 0; i !== sourceInfos.length; ++i) {
 
 			var sourceInfo = sourceInfos[i];
-			// alert(sourceInfo.facing + sourceInfo.label + sourceInfo.id);
 			id = sourceInfo.id;
-			// var option = document.createElement('option');
-			// option.value = sourceInfo.id;
-			// if (sourceInfo.kind === 'audio') {
-			//   option.text = sourceInfo.label || 'microphone ' +
-			//     (audioSelect.length + 1);
-			//   audioSelect.appendChild(option);
-			// } else if (sourceInfo.kind === 'video') {
-			//   option.text = sourceInfo.label || 'camera ' + (videoSelect.length + 1);
-			//   videoSelect.appendChild(option);
-			// } else {
-			//   console.log('Some other kind of source: ', sourceInfo);
-			// }
 		}
-		//	id = sourceInfos[0].id;
 		start();
 	}
 
@@ -77,37 +64,7 @@
 		navigator.getUserMedia(constraints, successCallback, errorCallback);
 	}
 
-	// start();
 
-	//
-	// 	if (!navigator.getUserMedia)
-	// 	{
-	// 		document.getElementById('errorMessage').innerHTML =
-	// 			'Sorry. <code>navigator.getUserMedia()</code> is not available.';
-	// 	} else {
-	// 		navigator.getUserMedia({video: true}, gotStream, noStream);
-	// 	}
-	//
-	// function gotStream(stream)
-	// {
-	// 	if (window.URL)
-	// 	{   camvideo.src = window.URL.createObjectURL(stream);   }
-	// 	else // Opera
-	// 	{   camvideo.src = stream;   }
-	//
-	// 	camvideo.onerror = function(e)
-	// 	{   stream.stop();   };
-	//
-	// 	stream.onended = noStream;
-	// }
-	//
-	// function noStream(e)
-	// {
-	// 	var msg = 'No camera available.';
-	// 	if (e.code == 1)
-	// 	{   msg = 'User denied access to use camera.';   }
-	// 	document.getElementById('errorMessage').textContent = msg;
-	// }
 	</script>
 
 	<script src="js/Three.js"></script>
@@ -287,7 +244,7 @@
 		controls.update();
 		stats.update();
 
-		resize();
+		 resize();
 
 		camera.updateProjectionMatrix();
 	}
@@ -295,15 +252,15 @@
 
 	function resize() {
 
-		// var width = container.offsetWidth;
-		// var height = container.offsetHeight;
-		//
-		// camera.aspect = width / height;
-		// camera.updateProjectionMatrix();
-		//
-		var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT =window.innerHeight;
-				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-						effect.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+		      var width = container.offsetWidth;
+		      var height = container.offsetHeight;
+
+		      camera.aspect = width / height;
+		      camera.updateProjectionMatrix();
+
+		      renderer.setSize(width, height);
+		      effect.setSize(width, height);
+
 	}
 
 
