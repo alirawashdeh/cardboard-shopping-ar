@@ -21,21 +21,23 @@ var videoElement = document.getElementById('video');
 
 
 function gotSources(sourceInfos) {
-  // for (var i = 0; i !== sourceInfos.length; ++i) {
-  //   var sourceInfo = sourceInfos[i];
-  //   var option = document.createElement('option');
-  //   option.value = sourceInfo.id;
-  //   if (sourceInfo.kind === 'audio') {
-  //     option.text = sourceInfo.label || 'microphone ' +
-  //       (audioSelect.length + 1);
-  //     audioSelect.appendChild(option);
-  //   } else if (sourceInfo.kind === 'video') {
-  //     option.text = sourceInfo.label || 'camera ' + (videoSelect.length + 1);
-  //     videoSelect.appendChild(option);
-  //   } else {
-  //     console.log('Some other kind of source: ', sourceInfo);
-  //   }
-  // }
+  for (var i = 0; i !== sourceInfos.length; ++i) {
+
+    var sourceInfo = sourceInfos[i];
+		alert(sourceInfo);
+    // var option = document.createElement('option');
+    // option.value = sourceInfo.id;
+    // if (sourceInfo.kind === 'audio') {
+    //   option.text = sourceInfo.label || 'microphone ' +
+    //     (audioSelect.length + 1);
+    //   audioSelect.appendChild(option);
+    // } else if (sourceInfo.kind === 'video') {
+    //   option.text = sourceInfo.label || 'camera ' + (videoSelect.length + 1);
+    //   videoSelect.appendChild(option);
+    // } else {
+    //   console.log('Some other kind of source: ', sourceInfo);
+    // }
+  }
 }
 
 if (typeof MediaStreamTrack === 'undefined' ||
