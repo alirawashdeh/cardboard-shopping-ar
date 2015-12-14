@@ -200,7 +200,7 @@ function init()
 	        controls.connect();
 	        controls.update();
 
-	        element.addEventListener('click', fullscreen, false);
+	        // element.addEventListener('click', fullscreen, false);
 
 	        // window.removeEventListener('deviceorientation', setOrientationControls, true);
 	      }
@@ -209,8 +209,8 @@ function init()
 
 
 	// EVENTS
-	THREEx.WindowResize(renderer, camera);
-	THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
+	// THREEx.WindowResize(renderer, camera);
+	// THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
 	// STATS
 	stats = new Stats();
 	stats.domElement.style.position = 'absolute';
