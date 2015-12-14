@@ -8,320 +8,323 @@
 </head>
 <body>
 
-<p id="errorMessage"></p>
+	<p id="errorMessage"></p>
 
-<video id="video" autoplay width="160" height="120" style="visibility: hidden; float:left;"></video>
-<canvas id="videoImage" width="160" height="120" style="visibility: hidden; float:left;"></canvas>
+	<video id="video" autoplay width="160" height="120" style="visibility: hidden; float:left;"></video>
+	<canvas id="videoImage" width="160" height="120" style="visibility: hidden; float:left;"></canvas>
 
-<script>
-navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-window.URL = window.URL || window.webkitURL;
+	<script>
+	navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+	window.URL = window.URL || window.webkitURL;
 
-var videoElement = document.getElementById('video');
-var id = 0;
+	var videoElement = document.getElementById('video');
+	var id = 0;
 
-function gotSources(sourceInfos) {
-  for (var i = 0; i !== sourceInfos.length; ++i) {
+	function gotSources(sourceInfos) {
+		for (var i = 0; i !== sourceInfos.length; ++i) {
 
-    var sourceInfo = sourceInfos[i];
-		// alert(sourceInfo.facing + sourceInfo.label + sourceInfo.id);
-		id = sourceInfo.id;
-    // var option = document.createElement('option');
-    // option.value = sourceInfo.id;
-    // if (sourceInfo.kind === 'audio') {
-    //   option.text = sourceInfo.label || 'microphone ' +
-    //     (audioSelect.length + 1);
-    //   audioSelect.appendChild(option);
-    // } else if (sourceInfo.kind === 'video') {
-    //   option.text = sourceInfo.label || 'camera ' + (videoSelect.length + 1);
-    //   videoSelect.appendChild(option);
-    // } else {
-    //   console.log('Some other kind of source: ', sourceInfo);
-    // }
-  }
-//	id = sourceInfos[0].id;
-	start();
-}
+			var sourceInfo = sourceInfos[i];
+			// alert(sourceInfo.facing + sourceInfo.label + sourceInfo.id);
+			id = sourceInfo.id;
+			// var option = document.createElement('option');
+			// option.value = sourceInfo.id;
+			// if (sourceInfo.kind === 'audio') {
+			//   option.text = sourceInfo.label || 'microphone ' +
+			//     (audioSelect.length + 1);
+			//   audioSelect.appendChild(option);
+			// } else if (sourceInfo.kind === 'video') {
+			//   option.text = sourceInfo.label || 'camera ' + (videoSelect.length + 1);
+			//   videoSelect.appendChild(option);
+			// } else {
+			//   console.log('Some other kind of source: ', sourceInfo);
+			// }
+		}
+		//	id = sourceInfos[0].id;
+		start();
+	}
 
-if (typeof MediaStreamTrack === 'undefined' ||
-    typeof MediaStreamTrack.getSources === 'undefined') {
-  alert('This browser does not support MediaStreamTrack.\n\nTry Chrome.');
-} else {
-  MediaStreamTrack.getSources(gotSources);
-}
+	if (typeof MediaStreamTrack === 'undefined' ||
+	typeof MediaStreamTrack.getSources === 'undefined') {
+		alert('This browser does not support MediaStreamTrack.\n\nTry Chrome.');
+	} else {
+		MediaStreamTrack.getSources(gotSources);
+	}
 
-function successCallback(stream) {
-  window.stream = stream; // make stream available to console
-  videoElement.src = window.URL.createObjectURL(stream);
-  videoElement.play();
-}
+	function successCallback(stream) {
+		window.stream = stream; // make stream available to console
+		videoElement.src = window.URL.createObjectURL(stream);
+		videoElement.play();
+	}
 
-function errorCallback(error) {
-  console.log('navigator.getUserMedia error: ', error);
-}
+	function errorCallback(error) {
+		console.log('navigator.getUserMedia error: ', error);
+	}
 
-function start() {
-  if (window.stream) {
-    videoElement.src = null;
-    window.stream.stop();
-  }
-  var videoSource = id;
+	function start() {
+		if (window.stream) {
+			videoElement.src = null;
+			window.stream.stop();
+		}
+		var videoSource = id;
 
-  var constraints = {
-    video: {
-      optional: [{
-        sourceId: videoSource
-      }]
-    }
-  };
-  navigator.getUserMedia(constraints, successCallback, errorCallback);
-}
+		var constraints = {
+			video: {
+				optional: [{
+					sourceId: videoSource
+				}]
+			}
+		};
+		navigator.getUserMedia(constraints, successCallback, errorCallback);
+	}
 
-// start();
+	// start();
 
-//
-// 	if (!navigator.getUserMedia)
-// 	{
-// 		document.getElementById('errorMessage').innerHTML =
-// 			'Sorry. <code>navigator.getUserMedia()</code> is not available.';
-// 	} else {
-// 		navigator.getUserMedia({video: true}, gotStream, noStream);
-// 	}
-//
-// function gotStream(stream)
-// {
-// 	if (window.URL)
-// 	{   camvideo.src = window.URL.createObjectURL(stream);   }
-// 	else // Opera
-// 	{   camvideo.src = stream;   }
-//
-// 	camvideo.onerror = function(e)
-// 	{   stream.stop();   };
-//
-// 	stream.onended = noStream;
-// }
-//
-// function noStream(e)
-// {
-// 	var msg = 'No camera available.';
-// 	if (e.code == 1)
-// 	{   msg = 'User denied access to use camera.';   }
-// 	document.getElementById('errorMessage').textContent = msg;
-// }
-</script>
+	//
+	// 	if (!navigator.getUserMedia)
+	// 	{
+	// 		document.getElementById('errorMessage').innerHTML =
+	// 			'Sorry. <code>navigator.getUserMedia()</code> is not available.';
+	// 	} else {
+	// 		navigator.getUserMedia({video: true}, gotStream, noStream);
+	// 	}
+	//
+	// function gotStream(stream)
+	// {
+	// 	if (window.URL)
+	// 	{   camvideo.src = window.URL.createObjectURL(stream);   }
+	// 	else // Opera
+	// 	{   camvideo.src = stream;   }
+	//
+	// 	camvideo.onerror = function(e)
+	// 	{   stream.stop();   };
+	//
+	// 	stream.onended = noStream;
+	// }
+	//
+	// function noStream(e)
+	// {
+	// 	var msg = 'No camera available.';
+	// 	if (e.code == 1)
+	// 	{   msg = 'User denied access to use camera.';   }
+	// 	document.getElementById('errorMessage').textContent = msg;
+	// }
+	</script>
 
-<script src="js/Three.js"></script>
-<script src="js/Detector.js"></script>
-<script src="js/Stats.js"></script>
-<script src="js/OrbitControls.js"></script>
-<script src="js/DeviceOrientationControls.js"></script>
-<script src="js/BoxGeometry.js"></script>
-<script src="js/StereoEffect.js"></script>
+	<script src="js/Three.js"></script>
+	<script src="js/Detector.js"></script>
+	<script src="js/Stats.js"></script>
+	<script src="js/OrbitControls.js"></script>
+	<script src="js/DeviceOrientationControls.js"></script>
+	<script src="js/BoxGeometry.js"></script>
+	<script src="js/StereoEffect.js"></script>
 
-<script src="js/THREEx.KeyboardState.js"></script>
-<script src="js/THREEx.FullScreen.js"></script>
-<script src="js/THREEx.WindowResize.js"></script>
+	<script src="js/THREEx.KeyboardState.js"></script>
+	<script src="js/THREEx.FullScreen.js"></script>
+	<script src="js/THREEx.WindowResize.js"></script>
 
-<!-- jQuery code to display an information button and box when clicked. -->
-<script src="js/jquery-1.9.1.js"></script>
-<script src="js/jquery-ui.js"></script>
-<link rel=stylesheet href="css/jquery-ui.css" />
-<link rel=stylesheet href="css/info.css"/>
+	<!-- jQuery code to display an information button and box when clicked. -->
+	<script src="js/jquery-1.9.1.js"></script>
+	<script src="js/jquery-ui.js"></script>
+	<link rel=stylesheet href="css/jquery-ui.css" />
+	<link rel=stylesheet href="css/info.css"/>
 
 
-<div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
-<script>
-/*
+	<div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
+	<script>
+	/*
 	Three.js "tutorials by example"
 	Author: Lee Stemkoski
 	Date: July 2013 (three.js v59dev)
-*/
+	*/
 
-// MAIN
+	// MAIN
 
-// standard global variables
-var container, scene, camera, renderer, controls, stats;
-var keyboard = new THREEx.KeyboardState();
+	// standard global variables
+	var container, scene, camera, renderer, controls, stats;
+	var keyboard = new THREEx.KeyboardState();
 
-// custom global variables
-var video, videoImage, videoImageContext, videoTexture;
+	// custom global variables
+	var video, videoImage, videoImageContext, videoTexture;
 
-init();
-animate();
+	init();
+	animate();
 
-// FUNCTIONS
-function init()
-{
+	// FUNCTIONS
+	function init()
+	{
 
 
-	// SCENE
-	scene = new THREE.Scene();
-	// CAMERA
-	 camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.001, 700);
+		// SCENE
+		scene = new THREE.Scene();
+		// CAMERA
+		camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.001, 700);
 
-	// var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 100, FAR = 20000;
-	// camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
-	scene.add(camera);
-	// camera.position.set(1,20,1);
-		 camera.position.set(0, 15, 0);
-	//camera.lookAt(scene.position);
+		// var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 100, FAR = 20000;
+		// camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
+		scene.add(camera);
+		// camera.position.set(1,20,1);
+		camera.position.set(0, 15, 0);
+		//camera.lookAt(scene.position);
 
-	// RENDERER
-	// if ( Detector.webgl )
+		// RENDERER
+		// if ( Detector.webgl )
 		renderer = new THREE.WebGLRenderer( {antialias:true} );
-	// else
-	// 	renderer = new THREE.CanvasRenderer();
-		var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
-	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-	container = document.getElementById( 'ThreeJS' );
-	container.appendChild( renderer.domElement );
-
-
-	    effect = new THREE.StereoEffect(renderer);
-			effect.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-	// CONTROLS
-	controls = new THREE.OrbitControls( camera, renderer.domElement );
-
-	      controls.center = new THREE.Vector3(
-	         camera.position.x + 0.5,
-	         camera.position.y,
-	         camera.position.z
-	       );
-	      // // controls.noPan = true;
-	      // controls.noZoom = true;
-
-	      // Our preferred controls via DeviceOrientation
-	      function setOrientationControls(e) {
-	        if (!e.alpha) {
-	          return;
-	        }
-
-	        controls = new THREE.DeviceOrientationControls(camera, true);
-	        controls.connect();
-	        controls.update();
-
-	        // element.addEventListener('click', fullscreen, false);
-
-	        // window.removeEventListener('deviceorientation', setOrientationControls, true);
-	      }
-	      window.addEventListener('deviceorientation', setOrientationControls, true);
+		// else
+		// 	renderer = new THREE.CanvasRenderer();
+		var SCREEN_WIDTH = window.outerWidth, SCREEN_HEIGHT = window.outerHeight;
 
 
 
-	// EVENTS
-	// THREEx.WindowResize(renderer, camera);
-	// THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
-	// STATS
-	stats = new Stats();
-	stats.domElement.style.position = 'absolute';
-	stats.domElement.style.bottom = '0px';
-	stats.domElement.style.zIndex = 100;
-	container.appendChild( stats.domElement );
-	// LIGHT
-	var light = new THREE.PointLight(0xffffff);
-	light.position.set(0,250,0);
-	scene.add(light);
-	// FLOOR
-	var floorTexture = new THREE.ImageUtils.loadTexture( './images/checkerboard.jpg' );
-	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
-	floorTexture.repeat.set( 10, 10 );
-	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-	var floorGeometry = new THREE.PlaneGeometry(80, 80, 1, 1);
-	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-	//floor.position.y = 0.5;
-	floor.position.set(0,0,0);
-	floor.rotation.x = Math.PI / 2;
-	scene.add(floor);
-	// SKYBOX/FOG
-	scene.fog = new THREE.FogExp2( 0x9999ff, 0.00025 );
-
-	///////////
-	// VIDEO //
-	///////////
-
-	video = document.getElementById( 'video' );
-
-	videoImage = document.getElementById( 'videoImage' );
-	videoImageContext = videoImage.getContext( '2d' );
-	// background color if no video present
-	videoImageContext.fillStyle = '#000000';
-	videoImageContext.fillRect( 0, 0, videoImage.width, videoImage.height );
-
-	videoTexture = new THREE.Texture( videoImage );
-	videoTexture.minFilter = THREE.LinearFilter;
-	videoTexture.magFilter = THREE.LinearFilter;
-
-	var movieMaterial = new THREE.MeshBasicMaterial( { map: videoTexture, overdraw: true, side:THREE.DoubleSide } );
-	// the geometry on which the movie will be displayed;
-	// 		movie image will be scaled to fit these dimensions.
-	var movieGeometry = new THREE.PlaneGeometry( 275, 275, 1, 1 );
-	var movieScreen = new THREE.Mesh( movieGeometry, movieMaterial );
-	movieScreen.position.set(0,0,-120);
-	camera.add(movieScreen);
+		renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+		container = document.getElementById( 'ThreeJS' );
+		container.appendChild( renderer.domElement );
 
 
-	var geo = new THREE.BoxGeometry(30,30,30)
-     var mat = new THREE.MeshBasicMaterial({ wireframe: false, color: 0xffffff })
-     var box = new THREE.Mesh(geo, mat)
-		 box.position.set(70,50,30);
-     scene.add(box)
+		effect = new THREE.StereoEffect(renderer);
+		effect.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+		// CONTROLS
+		controls = new THREE.OrbitControls( camera, renderer.domElement );
 
-	//scene.add(camera);
+		controls.center = new THREE.Vector3(
+			camera.position.x + 0.5,
+			camera.position.y,
+			camera.position.z
+		);
+		// // controls.noPan = true;
+		// controls.noZoom = true;
 
-	//camera.lookAt(movieScreen.position);
+		// Our preferred controls via DeviceOrientation
+		function setOrientationControls(e) {
+			if (!e.alpha) {
+				return;
+			}
+
+			controls = new THREE.DeviceOrientationControls(camera, true);
+			controls.connect();
+			controls.update();
+
+			// element.addEventListener('click', fullscreen, false);
+
+			// window.removeEventListener('deviceorientation', setOrientationControls, true);
+		}
+		window.addEventListener('deviceorientation', setOrientationControls, true);
 
 
-}
 
-function animate()
-{
-    requestAnimationFrame( animate );
-	render();
-	update();
-}
+		// EVENTS
+		// THREEx.WindowResize(renderer, camera);
+		// THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
+		// STATS
+		stats = new Stats();
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.bottom = '0px';
+		stats.domElement.style.zIndex = 100;
+		container.appendChild( stats.domElement );
+		// LIGHT
+		var light = new THREE.PointLight(0xffffff);
+		light.position.set(0,250,0);
+		scene.add(light);
+		// FLOOR
+		var floorTexture = new THREE.ImageUtils.loadTexture( './images/checkerboard.jpg' );
+		floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
+		floorTexture.repeat.set( 10, 10 );
+		var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+		var floorGeometry = new THREE.PlaneGeometry(80, 80, 1, 1);
+		var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+		//floor.position.y = 0.5;
+		floor.position.set(0,0,0);
+		floor.rotation.x = Math.PI / 2;
+		scene.add(floor);
+		// SKYBOX/FOG
+		scene.fog = new THREE.FogExp2( 0x9999ff, 0.00025 );
 
-function update()
-{
-	if ( keyboard.pressed("p") ) // pause
+		///////////
+		// VIDEO //
+		///////////
+
+		video = document.getElementById( 'video' );
+
+		videoImage = document.getElementById( 'videoImage' );
+		videoImageContext = videoImage.getContext( '2d' );
+		// background color if no video present
+		videoImageContext.fillStyle = '#000000';
+		videoImageContext.fillRect( 0, 0, videoImage.width, videoImage.height );
+
+		videoTexture = new THREE.Texture( videoImage );
+		videoTexture.minFilter = THREE.LinearFilter;
+		videoTexture.magFilter = THREE.LinearFilter;
+
+		var movieMaterial = new THREE.MeshBasicMaterial( { map: videoTexture, overdraw: true, side:THREE.DoubleSide } );
+		// the geometry on which the movie will be displayed;
+		// 		movie image will be scaled to fit these dimensions.
+		var movieGeometry = new THREE.PlaneGeometry( 275, 275, 1, 1 );
+		var movieScreen = new THREE.Mesh( movieGeometry, movieMaterial );
+		movieScreen.position.set(0,0,-120);
+		camera.add(movieScreen);
+
+
+		var geo = new THREE.BoxGeometry(30,30,30)
+		var mat = new THREE.MeshBasicMaterial({ wireframe: false, color: 0xffffff })
+		var box = new THREE.Mesh(geo, mat)
+		box.position.set(70,50,30);
+		scene.add(box)
+
+		//scene.add(camera);
+
+		//camera.lookAt(movieScreen.position);
+
+
+	}
+
+	function animate()
+	{
+		requestAnimationFrame( animate );
+		render();
+		update();
+	}
+
+	function update()
+	{
+		if ( keyboard.pressed("p") ) // pause
 		video.pause();
-	if ( keyboard.pressed("r") ) // resume
+		if ( keyboard.pressed("r") ) // resume
 		video.play();
-	controls.update();
-	stats.update();
+		controls.update();
+		stats.update();
 
 		resize();
 
 		camera.updateProjectionMatrix();
-}
-
-
-function resize() {
-
-	// var width = container.offsetWidth;
-	// var height = container.offsetHeight;
-	//
-	// camera.aspect = width / height;
-	// camera.updateProjectionMatrix();
-	//
-	 renderer.setSize(window.outerWidth,window.outerHeight);
-	  effect.setSize(window.outerWidth,window.outerHeight);
-}
-
-
-
-function render()
-{
-	if ( video.readyState === video.HAVE_ENOUGH_DATA )
-	{
-		videoImageContext.drawImage( video, 0, 0, videoImage.width, videoImage.height );
-		if ( videoTexture )
-			videoTexture.needsUpdate = true;
 	}
-	effect.render(scene,camera);
-	// renderer.render( scene, camera );
-}
 
-</script>
+
+	function resize() {
+
+		// var width = container.offsetWidth;
+		// var height = container.offsetHeight;
+		//
+		// camera.aspect = width / height;
+		// camera.updateProjectionMatrix();
+		//
+		renderer.setSize(window.outerWidth,window.outerHeight);
+		effect.setSize(window.outerWidth,window.outerHeight);
+	}
+
+
+
+	function render()
+	{
+		if ( video.readyState === video.HAVE_ENOUGH_DATA )
+		{
+			videoImageContext.drawImage( video, 0, 0, videoImage.width, videoImage.height );
+			if ( videoTexture )
+			videoTexture.needsUpdate = true;
+		}
+		effect.render(scene,camera);
+		// renderer.render( scene, camera );
+	}
+
+	</script>
 
 </body>
 </html>
