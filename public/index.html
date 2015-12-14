@@ -167,18 +167,18 @@ function init()
 	//camera.lookAt(scene.position);
 
 	// RENDERER
-	if ( Detector.webgl )
+	// if ( Detector.webgl )
 		renderer = new THREE.WebGLRenderer( {antialias:true} );
-	else
-		renderer = new THREE.CanvasRenderer();
+	// else
+	// 	renderer = new THREE.CanvasRenderer();
 		var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
 	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	container = document.getElementById( 'ThreeJS' );
 	container.appendChild( renderer.domElement );
 
 
-	      effect = new THREE.StereoEffect(renderer);
-effect.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+	    effect = new THREE.StereoEffect(renderer);
+			effect.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	// CONTROLS
 	controls = new THREE.OrbitControls( camera, renderer.domElement );
 
@@ -288,7 +288,14 @@ function update()
 		video.play();
 	controls.update();
 	stats.update();
+
+		resize();
+
+		camera.updateProjectionMatrix();
 }
+
+
+
 
 function render()
 {
