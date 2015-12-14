@@ -158,7 +158,7 @@ function init()
 	var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
 	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
 	scene.add(camera);
-	camera.position.set(0,150,400);
+	camera.position.set(100,100,100);
 	camera.lookAt(scene.position);
 	// RENDERER
 	if ( Detector.webgl )
@@ -171,13 +171,13 @@ function init()
 	// CONTROLS
 	controls = new THREE.OrbitControls( camera, renderer.domElement );
 
-	      controls.target.set(
-	        camera.position.x + 0.15,
-	        camera.position.y,
-	        camera.position.z
-	      );
-	      controls.noPan = true;
-	      controls.noZoom = true;
+	      // controls.target.set(
+	      //   camera.position.x + 0.15,
+	      //   camera.position.y,
+	      //   camera.position.z
+	      // );
+	      // controls.noPan = true;
+	      // controls.noZoom = true;
 
 	      // Our preferred controls via DeviceOrientation
 	      function setOrientationControls(e) {
@@ -249,8 +249,13 @@ function init()
 	movieScreen.position.set(0,0,-200);
 	camera.add(movieScreen);
 
+	//
+	// var geo = new THREE.BoxGeometry(1,1,1)
+  //    var mat = new THREE.MeshBasicMaterial({ wireframe: true, color: 0xffffff })
+  //    var box = new THREE.Mesh(geo, mat)
+  //    scene.add(box)
+
 	//scene.add(camera);
-	camera.position.set(100,100,100);
 
 	//camera.lookAt(movieScreen.position);
 
