@@ -23,8 +23,8 @@
 <body>
 	<p id="errorMessage"></p>
 
-	<video id="video" autoplay width="160" height="120" style="visibility: hidden; float:left;"></video>
-	<canvas id="videoImage" width="160" height="120" style="visibility: hidden; float:left;"></canvas>
+	<video id="video" autoplay width="320" height="240" style="visibility: hidden; float:left;"></video>
+	<canvas id="videoImage" width="320" height="240" style="visibility: hidden; float:left;"></canvas>
 
 	<div id="ThreeJS"></div>
 	<script>
@@ -88,7 +88,7 @@
 	<script src="js/BoxGeometry.js"></script>
 	<script src="js/StereoEffect.js"></script>
 	<script src="js/helvetiker_regular.typeface.js"></script>
-
+	<script src="js/ocrad.js"></script>
 	<script src="js/THREEx.KeyboardState.js"></script>
 	<script src="js/THREEx.FullScreen.js"></script>
 	<script src="js/THREEx.WindowResize.js"></script>
@@ -189,39 +189,9 @@
 		// SKYBOX/FOG
 		scene.fog = new THREE.FogExp2( 0x9999ff, 0.00025 );
 
+		addSpinnyBoxWithText('@al1ra');
 
 
-
-		// add some text
-		var text = new THREE.TextGeometry('@al1ra', {
-			size: 4,
-			height: 1
-		});
-		textMesh = new THREE.Mesh(text, new THREE.MeshBasicMaterial({
-			color: 0x44FF44, opacity: 1
-		}));
-
-		text.computeBoundingBox();
-		var textWidth = text.boundingBox.max.x - text.boundingBox.min.x;
-		textMesh.position.set( -0.5 * textWidth, 0, 20 );//left-rt/high/far
-		scene.add( textMesh );
-
-
-		// add a box
-		var geo = new THREE.BoxGeometry(20,20,20)
-		var mat = new THREE.MeshBasicMaterial({ wireframe: false, color: 0xffffff })
-		var box = new THREE.Mesh(geo, mat)
-
-		box.position.set( 0, 0, 0);//left-rt/high/far
-		scene.add(box);
-
-		textPivot = new THREE.Object3D();
-		textPivot.position.set(10,10,-70);
-		textPivot.add( box );
-		textPivot.add( textMesh );
-
-
-		scene.add(textPivot);
 
 
 		///////////
@@ -257,6 +227,41 @@
 
 	}
 
+	function addSpinnyBoxWithText( text)
+	{
+		scene.remove(box);
+		scene.remove(textMesh);
+		camera.remove(textPivot);
+		// add some text
+		var text = new THREE.TextGeometry(text, {
+			size: 4,
+			height: 1
+		});
+		textMesh = new THREE.Mesh(text, new THREE.MeshBasicMaterial({
+			color: 0x44FF44, opacity: 1
+		}));
+
+		text.computeBoundingBox();
+		var textWidth = text.boundingBox.max.x - text.boundingBox.min.x;
+		textMesh.position.set( -0.5 * textWidth, 0, 20 );//left-rt/high/far
+		scene.add( textMesh );
+
+		// add a box
+		var geo = new THREE.BoxGeometry(20,20,20)
+		var mat = new THREE.MeshBasicMaterial({ wireframe: false, color: 0xffffff })
+		var box = new THREE.Mesh(geo, mat)
+
+		box.position.set( 0, 0, 0);//left-rt/high/far
+		scene.add(box);
+
+		textPivot = new THREE.Object3D();
+		textPivot.position.set(10,10,-70);
+		textPivot.add( box );
+		textPivot.add( textMesh );
+
+		camera.add(textPivot);
+
+	}
 
 	function resize() {
 		var width = container.offsetWidth;
@@ -273,9 +278,10 @@
 		resize();
 
 		camera.updateProjectionMatrix();
-
 		controls.update(dt);
 		stats.update();
+
+
 
 
 		if(textPivot.rotation.y > 0.7)
@@ -284,9 +290,16 @@
 			if(textPivot.rotation.y < -0.7)
 				rotationVelocity = -rotationVelocity;
 
+				var string = OCRAD(videoImageContext);
 
+				if(string.length > 3)
+				{
+				addSpinnyBoxWithText(string.trim().replace(/\W/g, ''));
+				}
 
 		textPivot.rotation.y += rotationVelocity;
+
+
 		}
 
 		function render(dt) {
@@ -294,6 +307,7 @@
 			if ( video.readyState === video.HAVE_ENOUGH_DATA )
 			{
 				videoImageContext.drawImage( video, 0, 0, videoImage.width, videoImage.height );
+
 				if ( videoTexture )
 				videoTexture.needsUpdate = true;
 			}
