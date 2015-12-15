@@ -6,17 +6,17 @@
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<style>
-		/*body {
-			margin: 0px;
-			overflow: hidden;
-		}*/
-		#ThreeJS {
-			position: absolute;
-			top: 0;
-			left: 0;
-			right: 0;
-			bottom: 0;
-		}
+	/*body {
+	margin: 0px;
+	overflow: hidden;
+	}*/
+	#ThreeJS {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+	}
 	</style>
 	<link rel=stylesheet href="css/base.css"/>
 </head>
@@ -87,6 +87,7 @@
 	<script src="js/DeviceOrientationControls.js"></script>
 	<script src="js/BoxGeometry.js"></script>
 	<script src="js/StereoEffect.js"></script>
+	<script src="js/helvetiker_regular.typeface.js"></script>
 
 	<script src="js/THREEx.KeyboardState.js"></script>
 	<script src="js/THREEx.FullScreen.js"></script>
@@ -105,19 +106,22 @@
 	Date: July 2013 (three.js v59dev)
 	*/
 
-	var container, scene, camera, renderer, controls, stats;
+	var container, scene, camera, renderer, controls, stats, textPivot, textMesh, rotationVelocity;
 	var keyboard = new THREEx.KeyboardState();
 
 	// custom global variables
 	var video, videoImage, videoImageContext, videoTexture;
 
-	    var clock = new THREE.Clock();
+	var clock = new THREE.Clock();
 	init();
 	animate();
 
 	// FUNCTIONS
 	function init()
 	{
+
+		rotationVelocity = 0.05;
+
 		renderer = new THREE.WebGLRenderer();
 		element = renderer.domElement;
 		container = document.getElementById('ThreeJS');
@@ -185,6 +189,41 @@
 		// SKYBOX/FOG
 		scene.fog = new THREE.FogExp2( 0x9999ff, 0.00025 );
 
+
+
+
+		// add some text
+		var text = new THREE.TextGeometry('@al1ra', {
+			size: 4,
+			height: 1
+		});
+		textMesh = new THREE.Mesh(text, new THREE.MeshBasicMaterial({
+			color: 0x44FF44, opacity: 1
+		}));
+
+		text.computeBoundingBox();
+		var textWidth = text.boundingBox.max.x - text.boundingBox.min.x;
+		textMesh.position.set( -0.5 * textWidth, 0, 20 );//left-rt/high/far
+		scene.add( textMesh );
+
+
+		// add a box
+		var geo = new THREE.BoxGeometry(20,20,20)
+		var mat = new THREE.MeshBasicMaterial({ wireframe: false, color: 0xffffff })
+		var box = new THREE.Mesh(geo, mat)
+
+		box.position.set( 0, 0, 0);//left-rt/high/far
+		scene.add(box);
+
+		textPivot = new THREE.Object3D();
+		textPivot.position.set(20,20,-110);
+		textPivot.add( box );
+		textPivot.add( textMesh );
+
+
+		scene.add(textPivot);
+
+
 		///////////
 		// VIDEO //
 		///////////
@@ -201,83 +240,85 @@
 		videoTexture.minFilter = THREE.LinearFilter;
 		videoTexture.magFilter = THREE.LinearFilter;
 
+		//Webcam
 		var movieMaterial = new THREE.MeshBasicMaterial( { map: videoTexture, overdraw: true, side:THREE.DoubleSide } );
-		// the geometry on which the movie will be displayed;
-		// 		movie image will be scaled to fit these dimensions.
 		var movieGeometry = new THREE.PlaneGeometry( 275, 275, 1, 1 );
 		var movieScreen = new THREE.Mesh( movieGeometry, movieMaterial );
 		movieScreen.position.set(0,0,-120);
 		camera.add(movieScreen);
 
 
-		var geo = new THREE.BoxGeometry(30,30,30)
-		var mat = new THREE.MeshBasicMaterial({ wireframe: false, color: 0xffffff })
-		var box = new THREE.Mesh(geo, mat)
-		box.position.set(70,50,30);
-		scene.add(box);
+		window.addEventListener('resize', resize, false);
+		setTimeout(resize, 1);
 
-
-    window.addEventListener('resize', resize, false);
-    setTimeout(resize, 1);
 
 		//scene.add(camera);
-
 		//camera.lookAt(movieScreen.position);
-
 
 	}
 
 
-	    function resize() {
-	      var width = container.offsetWidth;
-	      var height = container.offsetHeight;
+	function resize() {
+		var width = container.offsetWidth;
+		var height = container.offsetHeight;
 
-	      camera.aspect = width / height;
-	      camera.updateProjectionMatrix();
+		camera.aspect = width / height;
+		camera.updateProjectionMatrix();
 
-	      renderer.setSize(width, height);
-	      effect.setSize(width, height);
-	    }
+		renderer.setSize(width, height);
+		effect.setSize(width, height);
+	}
 
-	    function update(dt) {
-	      resize();
+	function update(dt) {
+		resize();
 
-	      camera.updateProjectionMatrix();
+		camera.updateProjectionMatrix();
 
-	      controls.update(dt);
-				stats.update();
-	    }
+		controls.update(dt);
+		stats.update();
 
-	    function render(dt) {
-	      effect.render(scene, camera);
-				if ( video.readyState === video.HAVE_ENOUGH_DATA )
-				{
-					videoImageContext.drawImage( video, 0, 0, videoImage.width, videoImage.height );
-					if ( videoTexture )
-						videoTexture.needsUpdate = true;
-				}
-	    }
 
-	    function animate(t) {
-	      requestAnimationFrame(animate);
+		if(textPivot.rotation.y > 0.7)
+			rotationVelocity = -rotationVelocity;
 
-	      update(clock.getDelta());
-	      render(clock.getDelta());
-	    }
+			if(textPivot.rotation.y < -0.7)
+				rotationVelocity = -rotationVelocity;
 
-	    function fullscreen() {
-	      if (container.requestFullscreen) {
-	        container.requestFullscreen();
-	      } else if (container.msRequestFullscreen) {
-	        container.msRequestFullscreen();
-	      } else if (container.mozRequestFullScreen) {
-	        container.mozRequestFullScreen();
-	      } else if (container.webkitRequestFullscreen) {
-	        container.webkitRequestFullscreen();
-	      }
-	    }
 
-	</script>
 
-</body>
-</html>
+		textPivot.rotation.y += rotationVelocity;
+		}
+
+		function render(dt) {
+			effect.render(scene, camera);
+			if ( video.readyState === video.HAVE_ENOUGH_DATA )
+			{
+				videoImageContext.drawImage( video, 0, 0, videoImage.width, videoImage.height );
+				if ( videoTexture )
+				videoTexture.needsUpdate = true;
+			}
+		}
+
+		function animate(t) {
+			requestAnimationFrame(animate);
+
+			update(clock.getDelta());
+			render(clock.getDelta());
+		}
+
+		function fullscreen() {
+			if (container.requestFullscreen) {
+				container.requestFullscreen();
+			} else if (container.msRequestFullscreen) {
+				container.msRequestFullscreen();
+			} else if (container.mozRequestFullScreen) {
+				container.mozRequestFullScreen();
+			} else if (container.webkitRequestFullscreen) {
+				container.webkitRequestFullscreen();
+			}
+		}
+
+		</script>
+
+	</body>
+	</html>
