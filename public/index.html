@@ -27,6 +27,27 @@
 	<canvas id="videoImage" width="320" height="240" style="visibility: hidden; float:left;"></canvas>
 
 	<div id="ThreeJS"></div>
+
+
+		<script src="js/Three.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/Stats.js"></script>
+		<script src="js/OrbitControls.js"></script>
+		<script src="js/DeviceOrientationControls.js"></script>
+		<script src="js/BoxGeometry.js"></script>
+		<script src="js/StereoEffect.js"></script>
+		<script src="js/helvetiker_regular.typeface.js"></script>
+		<script src="js/ocrad.js"></script>
+		<script src="js/THREEx.KeyboardState.js"></script>
+		<script src="js/THREEx.FullScreen.js"></script>
+		<script src="js/THREEx.WindowResize.js"></script>
+
+		<!-- jQuery code to display an information button and box when clicked. -->
+		<script src="js/jquery-1.9.1.js"></script>
+		<script src="js/jquery-ui.js"></script>
+		<link rel=stylesheet href="css/jquery-ui.css" />
+		<link rel=stylesheet href="css/info.css"/>
+
 	<script>
 	navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 	window.URL = window.URL || window.webkitURL;
@@ -80,25 +101,6 @@
 
 	</script>
 
-	<script src="js/Three.js"></script>
-	<script src="js/Detector.js"></script>
-	<script src="js/Stats.js"></script>
-	<script src="js/OrbitControls.js"></script>
-	<script src="js/DeviceOrientationControls.js"></script>
-	<script src="js/BoxGeometry.js"></script>
-	<script src="js/StereoEffect.js"></script>
-	<script src="js/helvetiker_regular.typeface.js"></script>
-	<script src="js/ocrad.js"></script>
-	<script src="js/THREEx.KeyboardState.js"></script>
-	<script src="js/THREEx.FullScreen.js"></script>
-	<script src="js/THREEx.WindowResize.js"></script>
-
-	<!-- jQuery code to display an information button and box when clicked. -->
-	<script src="js/jquery-1.9.1.js"></script>
-	<script src="js/jquery-ui.js"></script>
-	<link rel=stylesheet href="css/jquery-ui.css" />
-	<link rel=stylesheet href="css/info.css"/>
-
 	<script>
 	/*
 	Three.js "tutorials by example"
@@ -112,6 +114,8 @@
 	// custom global variables
 	var video, videoImage, videoImageContext, videoTexture;
 
+	var timeofLastOCR;
+	var toggle = 1;
 	var clock = new THREE.Clock();
 	init();
 	animate();
@@ -120,7 +124,7 @@
 	function init()
 	{
 
-		rotationVelocity = 0.05;
+		rotationVelocity = 0.03;
 
 		renderer = new THREE.WebGLRenderer();
 		element = renderer.domElement;
@@ -128,7 +132,6 @@
 		container.appendChild(element);
 
 		effect = new THREE.StereoEffect(renderer);
-
 		scene = new THREE.Scene();
 
 		camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
@@ -160,8 +163,6 @@
 		}
 		window.addEventListener('deviceorientation', setOrientationControls, true);
 
-
-
 		// EVENTS
 		// THREEx.WindowResize(renderer, camera);
 		// THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
@@ -191,9 +192,6 @@
 
 		addSpinnyBoxWithText('@al1ra');
 
-
-
-
 		///////////
 		// VIDEO //
 		///////////
@@ -220,7 +218,7 @@
 
 		window.addEventListener('resize', resize, false);
 		setTimeout(resize, 1);
-
+		timeofLastOCR = clock.getElapsedTime();
 
 		//scene.add(camera);
 		//camera.lookAt(movieScreen.position);
@@ -229,6 +227,9 @@
 
 	function addSpinnyBoxWithText( text)
 	{
+
+		var rotationy = 0;
+		if(textPivot != null) rotationy = textPivot.rotation.y;
 		scene.remove(box);
 		scene.remove(textMesh);
 		camera.remove(textPivot);
@@ -238,27 +239,30 @@
 			height: 1
 		});
 		textMesh = new THREE.Mesh(text, new THREE.MeshBasicMaterial({
-			color: 0x44FF44, opacity: 1
-		}));
+			color: 0x222222, opacity: 1
+		})); //color: 0x44FF44
 
 		text.computeBoundingBox();
 		var textWidth = text.boundingBox.max.x - text.boundingBox.min.x;
-		textMesh.position.set( -0.5 * textWidth, 0, 20 );//left-rt/high/far
+		textMesh.position.set( -0.5 * textWidth, -0.5 * (text.boundingBox.max.y - text.boundingBox.min.y), 0.5 );//left-rt/high/far
 		scene.add( textMesh );
 
 		// add a box
-		var geo = new THREE.BoxGeometry(20,20,20)
+		var geo = new THREE.BoxGeometry(text.boundingBox.max.x + 5,text.boundingBox.max.y * 2.5,2)
 		var mat = new THREE.MeshBasicMaterial({ wireframe: false, color: 0xffffff })
+		mat.opacity = 0.75;
+		mat.transparent = true;
 		var box = new THREE.Mesh(geo, mat)
 
-		box.position.set( 0, 0, 0);//left-rt/high/far
+		box.position.set(0,0, 0);//left-rt/high/far
 		scene.add(box);
 
 		textPivot = new THREE.Object3D();
-		textPivot.position.set(10,10,-70);
+		textPivot.position.set(0,-20,-40);
 		textPivot.add( box );
 		textPivot.add( textMesh );
 
+		textPivot.rotation.y = rotationy;
 		camera.add(textPivot);
 
 	}
@@ -281,58 +285,79 @@
 		controls.update(dt);
 		stats.update();
 
+		// Rotate the box and text
+		if(textPivot.rotation.y > 0.5)
+		rotationVelocity = -rotationVelocity;
 
+		if(textPivot.rotation.y < -0.5)
+		rotationVelocity = -rotationVelocity;
 
+		// Carry out the OCR.
+		if(timeofLastOCR + 1 < clock.getElapsedTime())
+		{
 
-		if(textPivot.rotation.y > 0.7)
-			rotationVelocity = -rotationVelocity;
+		timeofLastOCR = clock.getElapsedTime();
 
-			if(textPivot.rotation.y < -0.7)
-				rotationVelocity = -rotationVelocity;
+		$.get( window.location.href + "gettoggle", function( data ) {
+			  $( ".result" ).html( data );
+					if(toggle != parseInt(data))
+					{
+						toggle = parseInt(data);
+						if(toggle)
+						{
+							//show
+							addSpinnyBoxWithText('@al1ra');
 
-				var string = OCRAD(videoImageContext);
+						}
+						else
+						{
+							//
+							scene.remove(textMesh);
+							camera.remove(textPivot);
+						}
+					}
+			});
 
-				if(string.length > 3)
-				{
-				addSpinnyBoxWithText(string.trim().replace(/\W/g, ''));
-				}
-
+		var string = OCRAD(videoImageContext);
+		string = string.trim().replace('_',' ').replace(/\W/g, '');
+		if(string.length > 2)
+		{
+			addSpinnyBoxWithText(string);
+		}
+		}
 		textPivot.rotation.y += rotationVelocity;
+	}
 
-
+	function render(dt) {
+		effect.render(scene, camera);
+		if ( video.readyState === video.HAVE_ENOUGH_DATA )
+		{
+			videoImageContext.drawImage( video, 0, 0, videoImage.width, videoImage.height );
+			if ( videoTexture )
+			videoTexture.needsUpdate = true;
 		}
+	}
 
-		function render(dt) {
-			effect.render(scene, camera);
-			if ( video.readyState === video.HAVE_ENOUGH_DATA )
-			{
-				videoImageContext.drawImage( video, 0, 0, videoImage.width, videoImage.height );
+	function animate(t) {
+		requestAnimationFrame(animate);
 
-				if ( videoTexture )
-				videoTexture.needsUpdate = true;
-			}
+		update(clock.getDelta());
+		render(clock.getDelta());
+	}
+
+	function fullscreen() {
+		if (container.requestFullscreen) {
+			container.requestFullscreen();
+		} else if (container.msRequestFullscreen) {
+			container.msRequestFullscreen();
+		} else if (container.mozRequestFullScreen) {
+			container.mozRequestFullScreen();
+		} else if (container.webkitRequestFullscreen) {
+			container.webkitRequestFullscreen();
 		}
+	}
 
-		function animate(t) {
-			requestAnimationFrame(animate);
+	</script>
 
-			update(clock.getDelta());
-			render(clock.getDelta());
-		}
-
-		function fullscreen() {
-			if (container.requestFullscreen) {
-				container.requestFullscreen();
-			} else if (container.msRequestFullscreen) {
-				container.msRequestFullscreen();
-			} else if (container.mozRequestFullScreen) {
-				container.mozRequestFullScreen();
-			} else if (container.webkitRequestFullscreen) {
-				container.webkitRequestFullscreen();
-			}
-		}
-
-		</script>
-
-	</body>
-	</html>
+</body>
+</html>
