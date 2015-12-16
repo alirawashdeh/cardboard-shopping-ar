@@ -108,14 +108,27 @@
 	Date: July 2013 (three.js v59dev)
 	*/
 
-	var container, scene, camera, renderer, controls, stats, textPivot, textMesh, rotationVelocity;
+	var container, scene, camera, renderer, controls, stats;
+
+	// OCR
+	var debugTextPivot, debugtextMesh, rotationVelocity;
+	var timeofLastOCR;
 	var keyboard = new THREEx.KeyboardState();
+	var debug = true;
 
 	// custom global variables
 	var video, videoImage, videoImageContext, videoTexture;
 
-	var timeofLastOCR;
+	// toggles
+	var timeOfLastToggleCheck;
 	var toggle = 1;
+	var json = {
+		 'items': [{name: "Eggs"}, {name: "Corn flakes"}, {name: "Bacon"}, {name: "More bacon!"}]
+	 };
+	 var listPivots = [];
+
+	 console.log(JSON.stringify(json));
+
 	var clock = new THREE.Clock();
 	init();
 	animate();
@@ -163,9 +176,7 @@
 		}
 		window.addEventListener('deviceorientation', setOrientationControls, true);
 
-		// EVENTS
-		// THREEx.WindowResize(renderer, camera);
-		// THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
+
 		// STATS
 		stats = new Stats();
 		stats.domElement.style.position = 'absolute';
@@ -176,6 +187,7 @@
 		var light = new THREE.PointLight(0xffffff);
 		light.position.set(0,250,0);
 		scene.add(light);
+
 		// FLOOR
 		var floorTexture = new THREE.ImageUtils.loadTexture( './images/checkerboard.jpg' );
 		floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
@@ -183,19 +195,18 @@
 		var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
 		var floorGeometry = new THREE.PlaneGeometry(80, 80, 1, 1);
 		var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-		//floor.position.y = 0.5;
 		floor.position.set(0,-10,0);
 		floor.rotation.x = Math.PI / 2;
 		scene.add(floor);
+
 		// SKYBOX/FOG
 		scene.fog = new THREE.FogExp2( 0x9999ff, 0.00025 );
 
-		addSpinnyBoxWithText('@al1ra');
+
 
 		///////////
 		// VIDEO //
 		///////////
-
 		video = document.getElementById( 'video' );
 
 		videoImage = document.getElementById( 'videoImage' );
@@ -215,37 +226,88 @@
 		movieScreen.position.set(0,0,-120);
 		camera.add(movieScreen);
 
-
+		//FULL SCREEN ON CLICK
 		window.addEventListener('resize', resize, false);
 		setTimeout(resize, 1);
-		timeofLastOCR = clock.getElapsedTime();
 
-		//scene.add(camera);
-		//camera.lookAt(movieScreen.position);
+		if(debug) setOnScreenDebugText('@al1ra');
+		timeofLastOCR = clock.getElapsedTime();
+		timeOfLastToggleCheck = clock.getElapsedTime();
+
+setList();
 
 	}
 
-	function addSpinnyBoxWithText( text)
+
+	function setList()
+	{
+
+
+
+		for(var i=0; i !== json.items.length; ++i)
+		{
+			if(listPivots[i] != null)
+			{
+			camera.remove(listPivots[i]);
+			}
+			var text = new THREE.TextGeometry(json.items[i].name, {
+				size: 4,
+				height: 1
+			});
+			itemTextMesh = new THREE.Mesh(text, new THREE.MeshBasicMaterial({
+				color: 0x222222, opacity: 1
+			})); //color: 0x44FF44
+
+			text.computeBoundingBox();
+			var textWidth = text.boundingBox.max.x - text.boundingBox.min.x;
+			itemTextMesh.position.set( 2.5, -0.5 * (text.boundingBox.max.y - text.boundingBox.min.y), 0.5 );//left-rt/high/far
+			scene.add( itemTextMesh );
+
+			// add a box
+			var geo = new THREE.BoxGeometry(text.boundingBox.max.x + 5,text.boundingBox.max.y * 2.5,2)
+			var mat = new THREE.MeshBasicMaterial({ wireframe: false, color: 0xffffff })
+			mat.opacity = 0.75;
+			mat.transparent = true;
+			var box = new THREE.Mesh(geo, mat)
+			box.position.set(0.5 *(text.boundingBox.max.x + 5),0, 0);//left-rt/high/far
+			scene.add(box);
+
+			itemPivot = new THREE.Object3D();
+			itemPivot.position.set(30,50 - (i * 12),-90);
+			itemPivot.add( box );
+			itemPivot.add( itemTextMesh );
+			itemPivot.rotation.y = -0.8;
+
+			listPivots[i] = itemPivot;
+			camera.add(listPivots[i]);
+
+
+		}
+
+
+	}
+
+	function setOnScreenDebugText( text)
 	{
 
 		var rotationy = 0;
-		if(textPivot != null) rotationy = textPivot.rotation.y;
+		if(debugTextPivot != null) rotationy = debugTextPivot.rotation.y;
 		scene.remove(box);
-		scene.remove(textMesh);
-		camera.remove(textPivot);
+		scene.remove(debugtextMesh);
+		camera.remove(debugTextPivot);
 		// add some text
 		var text = new THREE.TextGeometry(text, {
 			size: 4,
 			height: 1
 		});
-		textMesh = new THREE.Mesh(text, new THREE.MeshBasicMaterial({
+		debugtextMesh = new THREE.Mesh(text, new THREE.MeshBasicMaterial({
 			color: 0x222222, opacity: 1
 		})); //color: 0x44FF44
 
 		text.computeBoundingBox();
 		var textWidth = text.boundingBox.max.x - text.boundingBox.min.x;
-		textMesh.position.set( -0.5 * textWidth, -0.5 * (text.boundingBox.max.y - text.boundingBox.min.y), 0.5 );//left-rt/high/far
-		scene.add( textMesh );
+		debugtextMesh.position.set( -0.5 * textWidth, -0.5 * (text.boundingBox.max.y - text.boundingBox.min.y), 0.5 );//left-rt/high/far
+		scene.add( debugtextMesh );
 
 		// add a box
 		var geo = new THREE.BoxGeometry(text.boundingBox.max.x + 5,text.boundingBox.max.y * 2.5,2)
@@ -257,13 +319,13 @@
 		box.position.set(0,0, 0);//left-rt/high/far
 		scene.add(box);
 
-		textPivot = new THREE.Object3D();
-		textPivot.position.set(0,-20,-40);
-		textPivot.add( box );
-		textPivot.add( textMesh );
+		debugTextPivot = new THREE.Object3D();
+		debugTextPivot.position.set(0,-20,-40);
+		debugTextPivot.add( box );
+		debugTextPivot.add( debugtextMesh );
 
-		textPivot.rotation.y = rotationy;
-		camera.add(textPivot);
+		debugTextPivot.rotation.y = rotationy;
+		camera.add(debugTextPivot);
 
 	}
 
@@ -286,10 +348,10 @@
 		stats.update();
 
 		// Rotate the box and text
-		if(textPivot.rotation.y > 0.5)
+		if(debugTextPivot.rotation.y > 0.5)
 		rotationVelocity = -rotationVelocity;
 
-		if(textPivot.rotation.y < -0.5)
+		if(debugTextPivot.rotation.y < -0.5)
 		rotationVelocity = -rotationVelocity;
 
 		// Carry out the OCR.
@@ -297,6 +359,22 @@
 		{
 
 		timeofLastOCR = clock.getElapsedTime();
+
+		var string = OCRAD(videoImageContext);
+		string = string.trim().replace('_',' ').replace(/\W/g, '');
+		if(string.length > 2)
+		{
+			setOnScreenDebugText(string);
+		}
+		}
+		if(debug)
+		{
+		debugTextPivot.rotation.y += rotationVelocity;
+		}
+
+		// Carry out the OCR.
+		if(timeOfLastToggleCheck + 0.5 < clock.getElapsedTime())
+		{
 
 		$.get( window.location.href + "gettoggle", function( data ) {
 			  $( ".result" ).html( data );
@@ -306,26 +384,21 @@
 						if(toggle)
 						{
 							//show
-							addSpinnyBoxWithText('@al1ra');
+							setOnScreenDebugText('@al1ra');
 
 						}
 						else
 						{
 							//
-							scene.remove(textMesh);
-							camera.remove(textPivot);
+							scene.remove(debugtextMesh);
+							camera.remove(debugTextPivot);
 						}
 					}
 			});
+			timeOfLastToggleCheck = clock.getElapsedTime();
+		}
 
-		var string = OCRAD(videoImageContext);
-		string = string.trim().replace('_',' ').replace(/\W/g, '');
-		if(string.length > 2)
-		{
-			addSpinnyBoxWithText(string);
-		}
-		}
-		textPivot.rotation.y += rotationVelocity;
+
 	}
 
 	function render(dt) {
