@@ -361,6 +361,10 @@ setList();
 		timeofLastOCR = clock.getElapsedTime();
 
 		setTimeout(function() {
+				var test = videoImageContext.getImageData(0, 0, videoImage.width, videoImage.height);
+				for (var i = 0; i < test.data.length; i+=4) {
+				  test.data[i] = test.data[i+1] = test.data[i+2] = test.data[i] > 180 ? 255 : 0;
+				}
 		        var string = OCRAD(videoImageContext);
 		        finishOCR(string);
 		    }, 0);
@@ -402,7 +406,8 @@ setList();
 
 
 	function finishOCR(string){
-		string = string.trim().replace('_',' ').replace(/\W/g, '');
+		string = string.trim()
+		string = string.replace(/_/g,' ').replace(/\W/g, '');
 		if(string.length > 2)
 		{
 			setOnScreenDebugText(string);
