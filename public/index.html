@@ -355,18 +355,17 @@ setList();
 		rotationVelocity = -rotationVelocity;
 
 		// Carry out the OCR.
-		if(timeofLastOCR + 1 < clock.getElapsedTime())
+		if(timeofLastOCR + 2 < clock.getElapsedTime())
 		{
 
 		timeofLastOCR = clock.getElapsedTime();
 
-		var string = OCRAD(videoImageContext);
-		string = string.trim().replace('_',' ').replace(/\W/g, '');
-		if(string.length > 2)
-		{
-			setOnScreenDebugText(string);
-		}
-		}
+		setTimeout(function() {
+		        var string = OCRAD(videoImageContext);
+		        finishOCR(string);
+		    }, 0);
+
+			}
 		if(debug)
 		{
 		debugTextPivot.rotation.y += rotationVelocity;
@@ -399,6 +398,15 @@ setList();
 		}
 
 
+	}
+
+
+	function finishOCR(string){
+		string = string.trim().replace('_',' ').replace(/\W/g, '');
+		if(string.length > 2)
+		{
+			setOnScreenDebugText(string);
+		}
 	}
 
 	function render(dt) {
