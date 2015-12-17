@@ -361,11 +361,23 @@ setList();
 		timeofLastOCR = clock.getElapsedTime();
 
 		setTimeout(function() {
-				var test = videoImageContext.getImageData(0, 0, videoImage.width, videoImage.height);
-				for (var i = 0; i < test.data.length; i+=4) {
-				  test.data[i] = test.data[i+1] = test.data[i+2] = test.data[i] > 180 ? 255 : 0;
-				}
-		        var string = OCRAD(videoImageContext);
+
+			//
+			// var tempCanvas = document.createElement("canvas"),
+			//         tCtx = tempCanvas.getContext("2d");
+			//
+			//     tempCanvas.width = 640;
+			//     tempCanvas.height = 480;
+			//
+			//     tCtx.drawImage(canvas[0],0,0);
+			//
+			//
+			//
+				var imagedata = videoImageContext.getImageData(0, videoImage.height / 4, videoImage.width, videoImage.height / 2);
+				// for (var i = 0; i < imagedata.data.length; i+=4) {
+				//   imagedata.data[i] = imagedata.data[i+1] = imagedata.data[i+2] = imagedata.data[i] > 180 ? 255 : 0;
+				// }
+		        var string = OCRAD(imagedata);
 		        finishOCR(string);
 		    }, 0);
 
