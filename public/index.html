@@ -135,6 +135,8 @@
 	var listStrikethroughBoxes = [];
 	var listShowing =false;
 	var listHiding = false;
+	var listSlidingIn = false;
+	var listSlidingOut = false;
 	var listOpacity = 0;
 
 	console.log(JSON.stringify(json));
@@ -244,9 +246,8 @@
 		timeOfLastToggleCheck = clock.getElapsedTime();
 
 		listShowing = true;
+		listSlidingIn = true;
 		setList();
-
-
 	}
 
 
@@ -261,60 +262,114 @@
 				camera.remove(listPivots[i]);
 			}
 
-				var text = new THREE.TextGeometry(json.items[i].name, {
-					size: 4,
-					height: 1
-				});
-				itemTextMesh = new THREE.Mesh(text, new THREE.MeshBasicMaterial({
-					color: 0x222222, opacity: 0
-				})); //color: 0x44FF44
-				itemTextMesh.material.transparent = true;
-				itemTextMesh.material.opacity = listOpacity;
+			var text = new THREE.TextGeometry(json.items[i].name, {
+				size: 4,
+				height: 1
+			});
+			itemTextMesh = new THREE.Mesh(text, new THREE.MeshBasicMaterial({
+				color: 0x222222, opacity: 0
+			})); //color: 0x44FF44
+			itemTextMesh.material.transparent = true;
+			itemTextMesh.material.opacity = listOpacity;
 
-				text.computeBoundingBox();
-				var textWidth = text.boundingBox.max.x - text.boundingBox.min.x;
-				itemTextMesh.position.set( 2.5, -0.5 * (text.boundingBox.max.y - text.boundingBox.min.y), 0.5 );//left-rt/high/far
-				//scene.add( itemTextMesh );
+			text.computeBoundingBox();
+			var textWidth = text.boundingBox.max.x - text.boundingBox.min.x;
+			itemTextMesh.position.set( 2.5, -0.5 * (text.boundingBox.max.y - text.boundingBox.min.y), 0.5 );//left-rt/high/far
+			//scene.add( itemTextMesh );
 
+			// add a box
+			var geo = new THREE.BoxGeometry(text.boundingBox.max.x + 5,text.boundingBox.max.y * 2.5,2)
+			var mat = new THREE.MeshBasicMaterial({ wireframe: false, color: 0xffffff })
+			mat.transparent = true;
+			mat.opacity = listOpacity;
+			var box = new THREE.Mesh(geo, mat)
+			box.position.set(0.5 *(text.boundingBox.max.x + 5),0, 0);//left-rt/high/far
+			//scene.add(box);
+
+
+
+			itemPivot = new THREE.Object3D();
+			itemPivot.position.set(50 + (i * 10),50 - (i * 12),-90);
+			itemPivot.add( box );
+			itemPivot.add( itemTextMesh );
+			itemPivot.rotation.y = -0.8;
+
+			if(json.items[i].checked == true)
+			{
 				// add a box
-				var geo = new THREE.BoxGeometry(text.boundingBox.max.x + 5,text.boundingBox.max.y * 2.5,2)
-				var mat = new THREE.MeshBasicMaterial({ wireframe: false, color: 0xffffff })
+				var geo2 = new THREE.BoxGeometry(text.boundingBox.max.x + 1,0.5,1)
+				var mat2 = new THREE.MeshBasicMaterial({ wireframe: false, color: 0x222222 })
 				mat.transparent = true;
 				mat.opacity = listOpacity;
-				var box = new THREE.Mesh(geo, mat)
-				box.position.set(0.5 *(text.boundingBox.max.x + 5),0, 0);//left-rt/high/far
-				//scene.add(box);
+				listStrikethroughBoxes[i] = new THREE.Mesh(geo2, mat2)
+				listStrikethroughBoxes[i].position.set(0.5 * (text.boundingBox.max.x) + 2, -0.5, 1);//left-rt/high/far
+				itemPivot.add(listStrikethroughBoxes[i]);
+			}
 
-
-
-				itemPivot = new THREE.Object3D();
-				itemPivot.position.set(30,50 - (i * 12),-90);
-				itemPivot.add( box );
-				itemPivot.add( itemTextMesh );
-				itemPivot.rotation.y = -0.8;
-
-				if(json.items[i].checked == true)
-				{
-					// add a box
-					var geo2 = new THREE.BoxGeometry(text.boundingBox.max.x + 1,0.5,1)
-					var mat2 = new THREE.MeshBasicMaterial({ wireframe: false, color: 0x222222 })
-					mat.transparent = true;
-					mat.opacity = listOpacity;
-					listStrikethroughBoxes[i] = new THREE.Mesh(geo2, mat2)
-					listStrikethroughBoxes[i].position.set(0.5 * (text.boundingBox.max.x) + 2, -0.5, 1);//left-rt/high/far
-					itemPivot.add(listStrikethroughBoxes[i]);
-				}
-
-				listPivots[i] = itemPivot;
-				listText[i] = itemTextMesh;
-				listBoxes[i] = box;
-				camera.add(listPivots[i]);
+			listPivots[i] = itemPivot;
+			listText[i] = itemTextMesh;
+			listBoxes[i] = box;
+			camera.add(listPivots[i]);
 
 		}
 
 
 	}
 
+
+	function slideList()
+	{
+
+		if(listSlidingIn == true)
+		{
+			for(var i=0; i !== json.items.length; ++i)
+			{
+				if(listPivots[i].position.x > 30)
+				{
+					listPivots[i].position.x -= 2;
+				}
+				else
+				{
+					listPivots[i].position.x = 30;
+				}
+			}
+			if(listPivots[listPivots.length - 1].position.x <= 30)
+			{
+				listSlidingIn = false;
+				listPivots[listPivots.length - 1].position.x = 30
+			}
+
+		}
+
+
+		if(listSlidingOut == true)
+		{
+			for(var i=0; i !== json.items.length; ++i)
+			{
+				if(listPivots[i].position.x < 50 + (i *10))
+				{
+					if(i < listPivots.length - 1)
+					{
+						if(listPivots[i+1].position.x >= listPivots[i].position.x + 10)
+						{
+							listPivots[i].position.x += 2;
+
+						}
+					}
+					else
+					{
+						listPivots[i].position.x += 2;
+					}
+				}
+
+			}
+			if(listPivots[0].position.x >= 50)
+			{
+				listSlidingOut = false;
+			}
+		}
+
+	}
 
 
 
@@ -449,11 +504,13 @@
 						//setOnScreenDebugText('@al1ra');
 						listShowing = true;
 						listHiding = false;
+						listSlidingIn = true;
 					}
 					else
 					{
 						listShowing = false;
 						listHiding = true;
+						listSlidingOut = true;
 						// Hide Debug text
 						// scene.remove(debugtextMesh);
 						// camera.remove(debugTextPivot);
@@ -477,7 +534,7 @@
 
 		updateListOpacity();
 		updateToasterOpacity();
-
+		slideList();
 	}
 
 	function updateToasterOpacity()
@@ -510,7 +567,7 @@
 	{
 		if(listShowing)
 		{
-			listOpacity += 0.02;
+			listOpacity += 0.05;
 			if(listOpacity >= 0.75)
 			{
 				listShowing = false;
@@ -519,19 +576,19 @@
 			{
 				if(listPivots[i] != null)
 				{
-				camera.remove(listPivots[i]);
-				scene.remove(listPivots[i]);
-				listText[i].material.opacity = listOpacity;
-				listBoxes[i].material.opacity = listOpacity;
-				scene.add(listPivots[i]);
-				camera.add(listPivots[i]);
+					camera.remove(listPivots[i]);
+					scene.remove(listPivots[i]);
+					listText[i].material.opacity = listOpacity;
+					listBoxes[i].material.opacity = listOpacity;
+					scene.add(listPivots[i]);
+					camera.add(listPivots[i]);
 				}
 			}
 		}
 
 		if(listHiding)
 		{
-			listOpacity -= 0.02;
+			listOpacity -= 0.05;
 			if(listOpacity <= 0)
 			{
 				listHiding = false;
@@ -565,7 +622,7 @@
 					listShowing = true;
 					listHiding =false;
 				}
-					setToasterText('Welcome to ' + string);	
+				setToasterText('Welcome to ' + string);
 			}
 			else {
 				setToasterText('\"' + string + '\" found');
