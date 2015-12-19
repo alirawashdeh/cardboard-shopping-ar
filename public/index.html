@@ -29,24 +29,24 @@
 	<div id="ThreeJS"></div>
 
 
-		<script src="js/Three.js"></script>
-		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
-		<script src="js/OrbitControls.js"></script>
-		<script src="js/DeviceOrientationControls.js"></script>
-		<script src="js/BoxGeometry.js"></script>
-		<script src="js/StereoEffect.js"></script>
-		<script src="js/helvetiker_regular.typeface.js"></script>
-		<script src="js/ocrad.js"></script>
-		<script src="js/THREEx.KeyboardState.js"></script>
-		<script src="js/THREEx.FullScreen.js"></script>
-		<script src="js/THREEx.WindowResize.js"></script>
+	<script src="js/Three.js"></script>
+	<script src="js/Detector.js"></script>
+	<script src="js/Stats.js"></script>
+	<script src="js/OrbitControls.js"></script>
+	<script src="js/DeviceOrientationControls.js"></script>
+	<script src="js/BoxGeometry.js"></script>
+	<script src="js/StereoEffect.js"></script>
+	<script src="js/helvetiker_regular.typeface.js"></script>
+	<script src="js/ocrad.js"></script>
+	<script src="js/THREEx.KeyboardState.js"></script>
+	<script src="js/THREEx.FullScreen.js"></script>
+	<script src="js/THREEx.WindowResize.js"></script>
 
-		<!-- jQuery code to display an information button and box when clicked. -->
-		<script src="js/jquery-1.9.1.js"></script>
-		<script src="js/jquery-ui.js"></script>
-		<link rel=stylesheet href="css/jquery-ui.css" />
-		<link rel=stylesheet href="css/info.css"/>
+	<!-- jQuery code to display an information button and box when clicked. -->
+	<script src="js/jquery-1.9.1.js"></script>
+	<script src="js/jquery-ui.js"></script>
+	<link rel=stylesheet href="css/jquery-ui.css" />
+	<link rel=stylesheet href="css/info.css"/>
 
 	<script>
 	navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
@@ -123,11 +123,16 @@
 	var timeOfLastToggleCheck;
 	var toggle = 1;
 	var json = {
-		 'items': [{name: "Item 1"}, {name: "Item 2"}, {name: "Item 3"}, {name: "Item 4"}]
-	 };
-	 var listPivots = [];
+		'items': [{name: "Item 1"}, {name: "Item 2"}, {name: "Item 3"}, {name: "Item 4"}]
+	};
+	var listPivots = [];
+	var listText = [];
+	var listBoxes = [];
+	var listShowing =false;
+	var listHiding = false;
+	var listOpacity = 0;
 
-	 console.log(JSON.stringify(json));
+	console.log(JSON.stringify(json));
 
 	var clock = new THREE.Clock();
 	init();
@@ -234,7 +239,9 @@
 		timeofLastOCR = clock.getElapsedTime();
 		timeOfLastToggleCheck = clock.getElapsedTime();
 
-setList();
+		listShowing = true;
+		setList();
+
 
 	}
 
@@ -242,35 +249,35 @@ setList();
 	function setList()
 	{
 
-
-
 		for(var i=0; i !== json.items.length; ++i)
 		{
 			if(listPivots[i] != null)
 			{
-			camera.remove(listPivots[i]);
+				camera.remove(listPivots[i]);
 			}
 			var text = new THREE.TextGeometry(json.items[i].name, {
 				size: 4,
 				height: 1
 			});
 			itemTextMesh = new THREE.Mesh(text, new THREE.MeshBasicMaterial({
-				color: 0x222222, opacity: 1
+				color: 0x222222, opacity: 0
 			})); //color: 0x44FF44
+			itemTextMesh.material.transparent = true;
+			itemTextMesh.opacity = listOpacity;
 
 			text.computeBoundingBox();
 			var textWidth = text.boundingBox.max.x - text.boundingBox.min.x;
 			itemTextMesh.position.set( 2.5, -0.5 * (text.boundingBox.max.y - text.boundingBox.min.y), 0.5 );//left-rt/high/far
-			scene.add( itemTextMesh );
+			//scene.add( itemTextMesh );
 
 			// add a box
 			var geo = new THREE.BoxGeometry(text.boundingBox.max.x + 5,text.boundingBox.max.y * 2.5,2)
 			var mat = new THREE.MeshBasicMaterial({ wireframe: false, color: 0xffffff })
-			mat.opacity = 0.75;
 			mat.transparent = true;
+			mat.opacity = listOpacity;
 			var box = new THREE.Mesh(geo, mat)
 			box.position.set(0.5 *(text.boundingBox.max.x + 5),0, 0);//left-rt/high/far
-			scene.add(box);
+			//scene.add(box);
 
 			itemPivot = new THREE.Object3D();
 			itemPivot.position.set(30,50 - (i * 12),-90);
@@ -279,9 +286,9 @@ setList();
 			itemPivot.rotation.y = -0.8;
 
 			listPivots[i] = itemPivot;
+			listText[i] = itemTextMesh;
+			listBoxes[i] = box;
 			camera.add(listPivots[i]);
-
-
 		}
 
 
@@ -347,75 +354,104 @@ setList();
 		controls.update(dt);
 		stats.update();
 
-		// Rotate the box and text
-		if(debugTextPivot.rotation.y > 0.5)
-		rotationVelocity = -rotationVelocity;
-
-		if(debugTextPivot.rotation.y < -0.5)
-		rotationVelocity = -rotationVelocity;
 
 		// Carry out the OCR.
 		if(timeofLastOCR + 2 < clock.getElapsedTime())
 		{
 
-		timeofLastOCR = clock.getElapsedTime();
+			timeofLastOCR = clock.getElapsedTime();
 
-		setTimeout(function() {
-
-			//
-			// var tempCanvas = document.createElement("canvas"),
-			//         tCtx = tempCanvas.getContext("2d");
-			//
-			//     tempCanvas.width = 640;
-			//     tempCanvas.height = 480;
-			//
-			//     tCtx.drawImage(canvas[0],0,0);
-			//
-			//
-			//
+			setTimeout(function() {
 				var imagedata = videoImageContext.getImageData(0, videoImage.height / 4, videoImage.width, videoImage.height / 2);
-				// for (var i = 0; i < imagedata.data.length; i+=4) {
-				//   imagedata.data[i] = imagedata.data[i+1] = imagedata.data[i+2] = imagedata.data[i] > 180 ? 255 : 0;
-				// }
-		        var string = OCRAD(imagedata);
-		        finishOCR(string);
-		    }, 0);
+				var string = OCRAD(imagedata);
+				finishOCR(string);
+			}, 0);
 
-			}
+		}
 		if(debug)
 		{
-		debugTextPivot.rotation.y += rotationVelocity;
+			// Rotate the box and text
+			if(debugTextPivot.rotation.y > 0.5)
+			rotationVelocity = -rotationVelocity;
+
+			if(debugTextPivot.rotation.y < -0.5)
+			rotationVelocity = -rotationVelocity;
+
+			debugTextPivot.rotation.y += rotationVelocity;
 		}
 
-		// Carry out the OCR.
+		// Toggle Check.
 		if(timeOfLastToggleCheck + 0.5 < clock.getElapsedTime())
 		{
 
-		$.get( window.location.href + "gettoggle", function( data ) {
-			  $( ".result" ).html( data );
-					if(toggle != parseInt(data))
+			$.get( window.location.href + "getcommand", function( data ) {
+				$( ".result" ).html( data );
+				if(data == 'toggle')
+				{
+					toggle = !toggle;
+					if(toggle)
 					{
-						toggle = parseInt(data);
-						if(toggle)
-						{
-							//show
-							setOnScreenDebugText('@al1ra');
-
-						}
-						else
-						{
-							//
-							scene.remove(debugtextMesh);
-							camera.remove(debugTextPivot);
-						}
+						//show
+						//setOnScreenDebugText('@al1ra');
+						listShowing = true;
 					}
+					else
+					{
+						// Hide Debug text
+						listHiding = true;
+						// scene.remove(debugtextMesh);
+						// camera.remove(debugTextPivot);
+					}
+				}
+				
 			});
 			timeOfLastToggleCheck = clock.getElapsedTime();
 		}
 
 
+
+		updateListOpacity();
+
 	}
 
+	function updateListOpacity()
+	{
+		if(listShowing)
+		{
+			listOpacity += 0.01;
+			if(listOpacity >= 0.75)
+			{
+				listShowing = false;
+			}
+			for(var i=0; i !== json.items.length; ++i)
+			{
+				camera.remove(listPivots[i]);
+				scene.remove(listPivots[i]);
+				listText[i].material.opacity = listOpacity;
+				listBoxes[i].material.opacity = listOpacity;
+				scene.add(listPivots[i]);
+				camera.add(listPivots[i]);
+			}
+		}
+
+		if(listHiding)
+		{
+			listOpacity -= 0.01;
+			if(listOpacity <= 0)
+			{
+				listHiding = false;
+			}
+			for(var i=0; i !== json.items.length; ++i)
+			{
+				camera.remove(listPivots[i]);
+				scene.remove(listPivots[i]);
+				listText[i].material.opacity = listOpacity;
+				listBoxes[i].material.opacity = listOpacity;
+				scene.add(listPivots[i]);
+				camera.add(listPivots[i]);
+			}
+		}
+	}
 
 	function finishOCR(string){
 		string = string.trim()
