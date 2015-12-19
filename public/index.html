@@ -113,7 +113,12 @@
 	// OCR
 	var debugTextPivot, debugtextMesh, rotationVelocity;
 	var keyboard = new THREEx.KeyboardState();
-	var debug = true;
+	var debug = false;
+
+	// Toaster
+	var toasterTextPivot, toasterTextMesh, toasterBox;
+	var toasterHiding = false;
+	var toasterOpacity= 1;
 
 	// custom global variables
 	var video, videoImage, videoImageContext, videoTexture;
@@ -122,11 +127,12 @@
 	var timeOfLastToggleCheck;
 	var toggle = 1;
 	var json = {
-		'items': [{name: "Item 1"}, {name: "Item 2"}, {name: "Item 3"}, {name: "Item 4"}]
+		'items': [{name: "Eggs", checked: "false"}, {name: "Milk", checked: "false"}, {name: "Bread", checked: "false"}, {name: "Bacon", checked: "false"}]
 	};
 	var listPivots = [];
 	var listText = [];
 	var listBoxes = [];
+	var listStrikethroughBoxes = [];
 	var listShowing =false;
 	var listHiding = false;
 	var listOpacity = 0;
@@ -251,46 +257,106 @@
 		{
 			if(listPivots[i] != null)
 			{
+				scene.remove(listPivots[i]);
 				camera.remove(listPivots[i]);
 			}
-			var text = new THREE.TextGeometry(json.items[i].name, {
-				size: 4,
-				height: 1
-			});
-			itemTextMesh = new THREE.Mesh(text, new THREE.MeshBasicMaterial({
-				color: 0x222222, opacity: 0
-			})); //color: 0x44FF44
-			itemTextMesh.material.transparent = true;
-			itemTextMesh.opacity = listOpacity;
 
-			text.computeBoundingBox();
-			var textWidth = text.boundingBox.max.x - text.boundingBox.min.x;
-			itemTextMesh.position.set( 2.5, -0.5 * (text.boundingBox.max.y - text.boundingBox.min.y), 0.5 );//left-rt/high/far
-			//scene.add( itemTextMesh );
+				var text = new THREE.TextGeometry(json.items[i].name, {
+					size: 4,
+					height: 1
+				});
+				itemTextMesh = new THREE.Mesh(text, new THREE.MeshBasicMaterial({
+					color: 0x222222, opacity: 0
+				})); //color: 0x44FF44
+				itemTextMesh.material.transparent = true;
+				itemTextMesh.material.opacity = listOpacity;
 
-			// add a box
-			var geo = new THREE.BoxGeometry(text.boundingBox.max.x + 5,text.boundingBox.max.y * 2.5,2)
-			var mat = new THREE.MeshBasicMaterial({ wireframe: false, color: 0xffffff })
-			mat.transparent = true;
-			mat.opacity = listOpacity;
-			var box = new THREE.Mesh(geo, mat)
-			box.position.set(0.5 *(text.boundingBox.max.x + 5),0, 0);//left-rt/high/far
-			//scene.add(box);
+				text.computeBoundingBox();
+				var textWidth = text.boundingBox.max.x - text.boundingBox.min.x;
+				itemTextMesh.position.set( 2.5, -0.5 * (text.boundingBox.max.y - text.boundingBox.min.y), 0.5 );//left-rt/high/far
+				//scene.add( itemTextMesh );
 
-			itemPivot = new THREE.Object3D();
-			itemPivot.position.set(30,50 - (i * 12),-90);
-			itemPivot.add( box );
-			itemPivot.add( itemTextMesh );
-			itemPivot.rotation.y = -0.8;
+				// add a box
+				var geo = new THREE.BoxGeometry(text.boundingBox.max.x + 5,text.boundingBox.max.y * 2.5,2)
+				var mat = new THREE.MeshBasicMaterial({ wireframe: false, color: 0xffffff })
+				mat.transparent = true;
+				mat.opacity = listOpacity;
+				var box = new THREE.Mesh(geo, mat)
+				box.position.set(0.5 *(text.boundingBox.max.x + 5),0, 0);//left-rt/high/far
+				//scene.add(box);
 
-			listPivots[i] = itemPivot;
-			listText[i] = itemTextMesh;
-			listBoxes[i] = box;
-			camera.add(listPivots[i]);
+
+
+				itemPivot = new THREE.Object3D();
+				itemPivot.position.set(30,50 - (i * 12),-90);
+				itemPivot.add( box );
+				itemPivot.add( itemTextMesh );
+				itemPivot.rotation.y = -0.8;
+
+				if(json.items[i].checked == true)
+				{
+					// add a box
+					var geo2 = new THREE.BoxGeometry(text.boundingBox.max.x + 1,0.5,1)
+					var mat2 = new THREE.MeshBasicMaterial({ wireframe: false, color: 0x222222 })
+					mat.transparent = true;
+					mat.opacity = listOpacity;
+					listStrikethroughBoxes[i] = new THREE.Mesh(geo2, mat2)
+					listStrikethroughBoxes[i].position.set(0.5 * (text.boundingBox.max.x) + 2, -0.5, 1);//left-rt/high/far
+					itemPivot.add(listStrikethroughBoxes[i]);
+				}
+
+				listPivots[i] = itemPivot;
+				listText[i] = itemTextMesh;
+				listBoxes[i] = box;
+				camera.add(listPivots[i]);
+
 		}
 
 
 	}
+
+
+
+
+	function setToasterText( text)
+	{
+		scene.remove(toasterTextMesh);
+		camera.remove(toasterTextPivot);
+		// add some text
+		var text = new THREE.TextGeometry(text, {
+			size: 4,
+			height: 1
+		});
+		toasterTextMesh = new THREE.Mesh(text, new THREE.MeshBasicMaterial({
+			color: 0xEEEEff, opacity: 1
+		})); //color: 0x44FF44
+
+		text.computeBoundingBox();
+		var textWidth = text.boundingBox.max.x - text.boundingBox.min.x;
+		toasterTextMesh.position.set( -0.5 * textWidth, -0.5 * (text.boundingBox.max.y - text.boundingBox.min.y), 0.5 );//left-rt/high/far
+		scene.add( toasterTextMesh );
+		toasterTextMesh.material.transparent = true;
+
+		// add a box
+		var geo = new THREE.BoxGeometry(text.boundingBox.max.x + 5,text.boundingBox.max.y * 2.5,2)
+		var mat = new THREE.MeshBasicMaterial({ wireframe: false, color: 0x444444 })
+		mat.opacity = 0.75;
+		mat.transparent = true;
+		toasterBox= new THREE.Mesh(geo, mat)
+
+		toasterBox.position.set(0,0, 0);//left-rt/high/far
+		scene.add(toasterBox);
+
+		toasterTextPivot = new THREE.Object3D();
+		toasterTextPivot.position.set(0,0,-40);
+		toasterTextPivot.add( toasterBox );
+		toasterTextPivot.add( toasterTextMesh );
+
+		camera.add(toasterTextPivot);
+
+	}
+
+
 
 	function setOnScreenDebugText( text)
 	{
@@ -376,28 +442,30 @@
 				{
 					case 'toggle':
 
-						toggle = !toggle;
-						if(toggle)
-						{
-							//show
-							//setOnScreenDebugText('@al1ra');
-							listShowing = true;
-						}
-						else
-						{
-							// Hide Debug text
-							listHiding = true;
-							// scene.remove(debugtextMesh);
-							// camera.remove(debugTextPivot);
-						}
-						break;
+					toggle = !toggle;
+					if(toggle)
+					{
+						//show
+						//setOnScreenDebugText('@al1ra');
+						listShowing = true;
+						listHiding = false;
+					}
+					else
+					{
+						listShowing = false;
+						listHiding = true;
+						// Hide Debug text
+						// scene.remove(debugtextMesh);
+						// camera.remove(debugTextPivot);
+					}
+					break;
 					case 'snap':
-							setTimeout(function() {
-								var imagedata = videoImageContext.getImageData(0, videoImage.height / 4, videoImage.width, videoImage.height / 2);
-								var string = OCRAD(imagedata);
-								finishOCR(string);
-							}, 0);
-						break;
+					setTimeout(function() {
+						var imagedata = videoImageContext.getImageData(0, videoImage.height / 4, videoImage.width, videoImage.height / 2);
+						var string = OCRAD(imagedata);
+						finishOCR(string);
+					}, 0);
+					break;
 				}
 
 
@@ -408,8 +476,35 @@
 
 
 		updateListOpacity();
+		updateToasterOpacity();
 
 	}
+
+	function updateToasterOpacity()
+	{
+		if(toasterHiding)
+		{
+			toasterOpacity -= 0.02;
+			if(toasterOpacity <= 0)
+			{
+				toasterHiding = false;
+			}
+			if(toasterOpacity <= 0.75)
+			{
+				for(var i=0; i !== json.items.length; ++i)
+				{
+					camera.remove(toasterTextPivot);
+					scene.remove(toasterTextPivot);
+					toasterBox.material.opacity = toasterOpacity;
+					toasterTextMesh.material.opacity = toasterOpacity;
+					scene.add(toasterTextPivot);
+					camera.add(toasterTextPivot);
+				}
+			}
+
+		}
+	}
+
 
 	function updateListOpacity()
 	{
@@ -422,18 +517,21 @@
 			}
 			for(var i=0; i !== json.items.length; ++i)
 			{
+				if(listPivots[i] != null)
+				{
 				camera.remove(listPivots[i]);
 				scene.remove(listPivots[i]);
 				listText[i].material.opacity = listOpacity;
 				listBoxes[i].material.opacity = listOpacity;
 				scene.add(listPivots[i]);
 				camera.add(listPivots[i]);
+				}
 			}
 		}
 
 		if(listHiding)
 		{
-			listOpacity -= 0.01;
+			listOpacity -= 0.02;
 			if(listOpacity <= 0)
 			{
 				listHiding = false;
@@ -455,7 +553,42 @@
 		string = string.replace(/_/g,' ').replace(/\W/g, '');
 		if(string.length > 2)
 		{
-			setOnScreenDebugText(string);
+			setToasterText('\"' + string + '\" found');
+			toasterOpacity = 2;
+			toasterHiding = true;
+
+			checkForItem(string)
+
+			if(string.toLowerCase().indexOf('tesco') >= 0)
+			{
+
+				if(!toggle)
+				{
+					toggle = true;
+					listShowing = true;
+					listHiding =false;
+				}
+			}
+			if(debug)
+			{setOnScreenDebugText(string);
+			}
+		}
+	}
+
+	function checkForItem(string)
+	{
+		var redraw = false;
+		for(var i=0; i !== json.items.length; ++i)
+		{
+			if(json.items[i].name.toLowerCase() == string.toLowerCase())
+			{
+				json.items[i].checked = true;
+				redraw = true;
+			}
+		}
+		if(redraw)
+		{
+			setList();
 		}
 	}
 
