@@ -608,6 +608,10 @@
 				scene.remove(listPivots[i]);
 				listText[i].material.opacity = listOpacity;
 				listBoxes[i].material.opacity = listOpacity;
+				if(listStrikethroughBoxes[i] != null)
+					{
+						listStrikethroughBoxes[i].material.opacity = listOpacity;
+					}
 				scene.add(listPivots[i]);
 				camera.add(listPivots[i]);
 			}
