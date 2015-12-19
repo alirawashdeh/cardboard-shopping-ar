@@ -553,11 +553,8 @@
 		string = string.replace(/_/g,' ').replace(/\W/g, '');
 		if(string.length > 2)
 		{
-			setToasterText('\"' + string + '\" found');
-			toasterOpacity = 2;
-			toasterHiding = true;
 
-			checkForItem(string)
+			checkForItem(string);
 
 			if(string.toLowerCase().indexOf('tesco') >= 0)
 			{
@@ -568,7 +565,14 @@
 					listShowing = true;
 					listHiding =false;
 				}
+					setToasterText('Welcome to ' + string);	
 			}
+			else {
+				setToasterText('\"' + string + '\" found');
+			}
+			toasterOpacity = 2;
+			toasterHiding = true;
+
 			if(debug)
 			{setOnScreenDebugText(string);
 			}
