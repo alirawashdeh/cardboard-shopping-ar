@@ -286,8 +286,6 @@
 			box.position.set(0.5 *(text.boundingBox.max.x + 5),0, 0);//left-rt/high/far
 			//scene.add(box);
 
-
-
 			itemPivot = new THREE.Object3D();
 			if(listSlidingIn)
 			{
@@ -295,7 +293,7 @@
 			}
 			else
 			{
-				itemPivot.position.set(30,50 - (i * 12),-90);	
+				itemPivot.position.set(30,50 - (i * 12),-90);
 			}
 			itemPivot.add( box );
 			itemPivot.add( itemTextMesh );
@@ -587,6 +585,10 @@
 					scene.remove(listPivots[i]);
 					listText[i].material.opacity = listOpacity;
 					listBoxes[i].material.opacity = listOpacity;
+					if(listStrikethroughBoxes[i] != null)
+					{
+						listStrikethroughBoxes[i].material.opacity = listOpacity;
+					}
 					scene.add(listPivots[i]);
 					camera.add(listPivots[i]);
 				}
