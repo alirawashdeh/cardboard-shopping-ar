@@ -289,7 +289,14 @@
 
 
 			itemPivot = new THREE.Object3D();
+			if(listSlidingIn)
+			{
 			itemPivot.position.set(50 + (i * 10),50 - (i * 12),-90);
+			}
+			else
+			{
+				itemPivot.position.set(50,50 - (i * 12),-90);	
+			}
 			itemPivot.add( box );
 			itemPivot.add( itemTextMesh );
 			itemPivot.rotation.y = -0.8;
@@ -615,7 +622,6 @@
 
 			if(string.toLowerCase().indexOf('tesco') >= 0)
 			{
-
 				if(!toggle)
 				{
 					toggle = true;
