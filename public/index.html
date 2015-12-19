@@ -304,8 +304,8 @@
 				// add a box
 				var geo2 = new THREE.BoxGeometry(text.boundingBox.max.x + 1,0.5,1)
 				var mat2 = new THREE.MeshBasicMaterial({ wireframe: false, color: 0x222222 })
-				mat.transparent = true;
-				mat.opacity = listOpacity;
+				mat2.transparent = true;
+				mat2.opacity = listOpacity;
 				listStrikethroughBoxes[i] = new THREE.Mesh(geo2, mat2)
 				listStrikethroughBoxes[i].position.set(0.5 * (text.boundingBox.max.x) + 2, -0.5, 1);//left-rt/high/far
 				itemPivot.add(listStrikethroughBoxes[i]);
