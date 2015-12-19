@@ -112,7 +112,6 @@
 
 	// OCR
 	var debugTextPivot, debugtextMesh, rotationVelocity;
-	var timeofLastOCR;
 	var keyboard = new THREEx.KeyboardState();
 	var debug = true;
 
@@ -236,7 +235,6 @@
 		setTimeout(resize, 1);
 
 		if(debug) setOnScreenDebugText('@al1ra');
-		timeofLastOCR = clock.getElapsedTime();
 		timeOfLastToggleCheck = clock.getElapsedTime();
 
 		listShowing = true;
@@ -355,19 +353,7 @@
 		stats.update();
 
 
-		// Carry out the OCR.
-		if(timeofLastOCR + 2 < clock.getElapsedTime())
-		{
 
-			timeofLastOCR = clock.getElapsedTime();
-
-			setTimeout(function() {
-				var imagedata = videoImageContext.getImageData(0, videoImage.height / 4, videoImage.width, videoImage.height / 2);
-				var string = OCRAD(imagedata);
-				finishOCR(string);
-			}, 0);
-
-		}
 		if(debug)
 		{
 			// Rotate the box and text
@@ -386,24 +372,35 @@
 
 			$.get( window.location.href + "getcommand", function( data ) {
 				$( ".result" ).html( data );
-				if(data == 'toggle')
+				switch(data)
 				{
-					toggle = !toggle;
-					if(toggle)
-					{
-						//show
-						//setOnScreenDebugText('@al1ra');
-						listShowing = true;
-					}
-					else
-					{
-						// Hide Debug text
-						listHiding = true;
-						// scene.remove(debugtextMesh);
-						// camera.remove(debugTextPivot);
-					}
+					case 'toggle':
+
+						toggle = !toggle;
+						if(toggle)
+						{
+							//show
+							//setOnScreenDebugText('@al1ra');
+							listShowing = true;
+						}
+						else
+						{
+							// Hide Debug text
+							listHiding = true;
+							// scene.remove(debugtextMesh);
+							// camera.remove(debugTextPivot);
+						}
+						break;
+					case 'snap':
+							setTimeout(function() {
+								var imagedata = videoImageContext.getImageData(0, videoImage.height / 4, videoImage.width, videoImage.height / 2);
+								var string = OCRAD(imagedata);
+								finishOCR(string);
+							}, 0);
+						break;
 				}
-				
+
+
 			});
 			timeOfLastToggleCheck = clock.getElapsedTime();
 		}
@@ -418,7 +415,7 @@
 	{
 		if(listShowing)
 		{
-			listOpacity += 0.01;
+			listOpacity += 0.02;
 			if(listOpacity >= 0.75)
 			{
 				listShowing = false;
