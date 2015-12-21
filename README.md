@@ -20,7 +20,7 @@ $ node app.js
 
 # Usage
 
-The application carries out OCR on receipt of a GET request as follows:
+The application carries out OCR on receipt of a GET request as follows:  
 
 ```
 $ curl http://urlofdeployedapplication.com/setcommand?command=snap
@@ -30,6 +30,8 @@ The application also toggles the shopping list on and off on receipt of the foll
 ```
 $ curl http://urlofdeployedapplication.com/setcommand?command=toggle
 ```
+
+The demonstration video shows these commands being initiated from a Pebble smartwatch. This was done using [PebbleTasker](https://play.google.com/store/apps/details?id=com.kodek.pebbletasker&hl=en_GB) for Pebble and [Tasker](https://play.google.com/store/apps/details?id=net.dinglisch.android.taskerm&hl=en_GB) for Android (Each task initiates a GET request)
 
 # Credits
 
