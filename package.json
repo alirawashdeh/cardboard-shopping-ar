@@ -1,7 +1,7 @@
 {
   "author": "alirawashdeh",
-  "name": "wundervoice-oauth",
-  "description": "Authentication server for the WunderVoice Pebble smartwatch app",
+  "name": "cardboard-shopping-ar",
+  "description": "A Shopping list application for Google Cardboard, using OCR and the Pebble smartwatch - from the #codeforcardboard hackathon",
   "version": "0.0.1",
   "main": "app.js",
   "dependencies": {
