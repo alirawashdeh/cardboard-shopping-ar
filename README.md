@@ -1,42 +1,34 @@
-# wundervoice-oauth
+# Google Cardboard "Shopping List" Hack
 
-WunderVoice is a Pebble smartwatch app that allows you to quickly add items to a Wunderlist list using speech.
+The "Shopping List" is an application created at the Code for Cardboard (#codeforcardboard) hackathon. See the following video for more information:
 
-This repository contains a node.js app, used by the WunderVoice pebble app to authenticate with Wunderlist.
+[![ScreenShot](https://i.ytimg.com/vi_webp/Vyf4HoYIlYM/mqdefault.webp)](https://youtu.be/Vyf4HoYIlYM)
 
-See [wundervoice](https://github.com/alirawashdeh/wundervoice) on github for the source code of the Pebble application itself.
-
-Your app should now be running on [localhost:5000](http://localhost:5000/).
-
-
-## Configuration
-
-Sign up for API keys at [Wunderlist Developer](https://developer.wunderlist.com). Edit the following three lines app.js
-
- *****heroku config:set GITHUB_USERNAME=joesmith
-******before running locally, 8
+Note: Couldn't get access to the rear camera in Chrome on Samsung Galaxy S6, so use the Internet app instead if you're on a Galaxy phone.
 
 ## Running Locally
 
-Make sure you have [Node.js](http://nodejs.org/) and the [Heroku Toolbelt](https://toolbelt.heroku.com/) installed.
+To run the application locally:
 
 ```sh
-$ git clone git@github.com:heroku/node-js-getting-started.git # or clone your own fork
-$ cd wundervoice-oauth
+$ cd cardboard-shopping-ar
 $ npm install
-$ foreman start
+$ node app.js
 ```
 
-Your app should now be running on [localhost:5000](http://localhost:5000/).
+# Usage
 
-## Deploying to Heroku
+The application carries out OCR on receipt of a GET request as follows:
 
 ```
-$ heroku create
-$ git push heroku master
-$ heroku open
+$ curl http://urlofdeployedapplication.com/setcommand?command=snap
+```
+The application also toggles the shopping list on and off on receipt of the following GET request:
+
+```
+$ curl http://urlofdeployedapplication.com/setcommand?command=toggle
 ```
 
-# credits
+# Credits
 
-Forked from a combination of node-js-getting-started
+Lots of code borrowed from [Stemkoski](https://github.com/stemkoski/three.js) and [Ionic Cardboard](https://github.com/driftyco/ionic-starter-cardboard)
